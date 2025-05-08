@@ -1,0 +1,39 @@
+<div class="d-sm-flex align-items-center justify-content-between border-bottom">
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Overview</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#audiences" role="tab" aria-selected="false">Audiences</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#demographics" role="tab" aria-selected="false">Demographics</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link border-0" id="more-tab" data-bs-toggle="tab" href="#more" role="tab" aria-selected="false">More</a>
+      </li>
+      <% if (user.role === "Admin") { %>
+        <li class="nav-item">
+          <a class="nav-link" id="admin-tab" data-bs-toggle="tab" href="#admin" role="tab" aria-selected="false">Admin Settings</a>
+        </li>
+      <% } %>
+    </ul>
+    <div>
+      <div class="btn-wrapper">
+<!-- تخصيص الأزرار بناءً على دور المستخدم -->
+<% if (user && user.role === 'Admin') { %>
+<a href="#" class="btn btn-otline-dark align-items-center"><i class="icon-share"></i> Share</a>
+<a href="#" class="btn btn-otline-dark"><i class="icon-printer"></i> Print</a>
+<a href="#" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export</a>
+<% } else if (user && user.role === 'Teacher') { %>
+<!-- أزرار خاصة بالمدرس -->
+<a href="#" class="btn btn-otline-dark align-items-center"><i class="icon-plus"></i> Add Course</a>
+<a href="#" class="btn btn-otline-dark"><i class="icon-edit"></i> Manage Courses</a>
+<a href="#" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Download Reports</a>
+<% } else if (user && user.role === 'Student') { %>
+<!-- قد لا تحتاج لعرض بعض الأزرار للطلاب -->
+<a href="#" class="btn btn-otline-dark"><i class="icon-download"></i> Download</a>
+<% } %>
+      </div>
+    </div>
+  </div>

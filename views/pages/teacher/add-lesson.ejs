@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Teacher Dashboard - Add Course</title>
+        <link rel="stylesheet" href="/assets/vendors/feather/feather.css">
+        <link rel="stylesheet" href="/assets/vendors/mdi/css/materialdesignicons.min.css">
+        <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
+        <link rel="stylesheet" href="/assets/css/style.css">
+        <link rel="stylesheet" href="/assets/vendors/ti-icons/css/themify-icons.css">
+        <link rel="stylesheet" href="/assets/vendors/simple-line-icons/css/simple-line-icons.css">
+     <style>
+  
+     </style>
+      </head>
+  <body class="with-welcome-text">
+    <div class="container-scroller">
+      <!-- partials/starAdminpartials/_navbar.ejs -->
+     <%- include('../../partials/starAdminpartials/_navbar.ejs') %>
+      <!-- partial -->
+      <div class="container-fluid page-body-wrapper">
+        <!-- partials/starAdminpartials/_sidebar.ejs -->
+        <%- include('../../partials/starAdminpartials/sidebarLessons.ejs') %>
+        <!-- Content -->
+        <div class="col-12 d-flex justify-content-center">
+          <div class="card" style="width: 60%; margin-right: 200px;">
+                      <!-- Flash Messages -->
+          <% if (error && error.length > 0) { %>
+            <div class="alert alert-danger">
+              <%= error[0] %>
+            </div>
+          <% } %>
+
+          <% if (success && success.length > 0) { %>
+            <div class="alert alert-success">
+              <%= success[0] %>
+            </div>
+          <% } %>
+            <div class="card-body">
+                <h4 class="card-title">Add Lesson for <%= course.title %> course</h4>
+                <p class="card-description"> Add Lesson form </p>
+                <form class="forms-sample" action="/teacher/courses/<%= course._id %>/addLesson" method="POST">
+                  <div class="form-group">
+                    <label for="exampleInputName1">Lesson Title</label>
+                    <input type="text" class="form-control" id="exampleInputName1" placeholder="Name" name="title" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleInputEmail3">Lesson Content</label>
+                    <input type="text" class="form-control" id="exampleInputEmail3" placeholder="Description" name="content" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleInputPassword4">Lesson Order</label>
+                    <input type="number" class="form-control" id="exampleInputPassword4" placeholder="Order" name="order" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleInputEmail3">Video Url</label>
+                    <input type="text" class="form-control" id="exampleInputEmail3" placeholder="Video URL" name="videoUrl">
+                  </div>
+              
+                  <button type="submit" class="btn btn-primary me-2">Add Lesson</button>
+                  <a href="/teacher/courses/<%= course._id %>/lessons" class="btn btn-light">Cancel</a>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+        <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
+    <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
+    <script src="/assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+    <script src="/assets/vendors/chart.js/chart.umd.js"></script>
+    <script src="/assets/vendors/progressbar.js/progressbar.min.js"></script>
+    <script src="/assets/js/off-canvas.js"></script>
+    <script src="/assets/js/template.js"></script>
+    <script src="/assets/js/settings.js"></script>
+    <script src="/assets/js/hoverable-collapse.js"></script>
+    <script src="/assets/js/todolist.js"></script>
+    <script src="/assets/js/jquery.cookie.js" type="text/javascript"></script>
+    <script src="/assets/js/file-upload.js"></script>
+
+    
+  </body>
+</html>

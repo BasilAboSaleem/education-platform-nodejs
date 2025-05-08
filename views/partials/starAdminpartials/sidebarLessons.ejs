@@ -1,0 +1,82 @@
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+    <ul class="nav">
+      <!-- Dashboard -->
+      <li class="nav-item">
+        <a class="nav-link" href="/dashboard">
+          <i class="mdi mdi-grid-large menu-icon"></i>
+          <span class="menu-title">Dashboard</span>
+        </a>
+      </li>
+              <% if (user.role==="Teacher" ) { %>
+
+                <!-- Manage Lessons -->
+                <li class="nav-item nav-category">Lessons Management</li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/teacher/courses/<%= course._id %>/lessons">
+                    <i class="menu-icon mdi mdi-book-outline"></i>
+                    <span class="menu-title">Lessons</span>
+                  </a>
+                </li>
+                
+                <li class="nav-item">
+                  <a class="nav-link" href="/teacher/courses/<%= course._id %>/addLesson">
+                    <i class="menu-icon mdi mdi-book-plus-outline"></i>
+                    <span class="menu-title">Add Lesson</span>
+                  </a>
+                </li>
+                <!-- Course Management -->
+                <li class="nav-item nav-category">Course Management</li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/teacher/courses/view/<%= course._id %>">
+                      <i class="menu-icon mdi mdi-arrow-left-bold-outline"></i>
+                      <span class="menu-title">Back to Course</span>
+                    </a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/teacher/courses">
+                    <i class="menu-icon mdi mdi-book-outline"></i>
+                    <span class="menu-title">My Courses</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/teacher/add-course">
+                    <i class="menu-icon mdi mdi-plus-box-outline"></i>
+                    <span class="menu-title">Add New Course</span>
+                  </a>
+                </li>
+   
+                <!-- Enrollments -->
+                <li class="nav-item nav-category">Enrollments</li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/teacher/enrollments">
+                    <i class="menu-icon mdi mdi-account-multiple-outline"></i>
+                    <span class="menu-title">Student Enrollments</span>
+                  </a>
+                </li>
+  
+                <!-- Profile -->
+                <li class="nav-item nav-category">Profile</li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/teacher/profile">
+                    <i class="menu-icon mdi mdi-account-edit-outline"></i>
+                    <span class="menu-title">Edit Profile</span>
+                  </a>
+                </li>
+  
+  
+  
+                <% } %>
+                  <!-- Logout -->
+                  <li class="nav-item nav-category">Account</li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/logout">
+                      <i class="menu-icon mdi mdi-logout"></i>
+                      <span class="menu-title">Logout</span>
+                    </a>
+                  </li>
+    </ul>
+  </nav>
+  
+  
+  
+ 

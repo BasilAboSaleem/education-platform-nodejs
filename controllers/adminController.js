@@ -1,0 +1,824 @@
+const User = require("../models/user");
+const Student = require("../models/student");
+const Teachers = require("../models/teacher");
+const Category = require("../models/Category");
+const Course = require("../models/course");
+const Lesson = require("../models/lesson");
+const { check, validationResult } = require("express-validator");
+const bcrypt = require('bcrypt');
+var jwt = require("jsonwebtoken");
+const moment = require('moment');
+const multer  = require('multer')
+const upload = multer({storage: multer.diskStorage({})});
+const cloudinary = require("cloudinary").v2;
+require('dotenv').config();
+const fs = require('fs');
+
+ // Configuration cloudinary اعدادات الكلاودنري
+ cloudinary.config({ 
+  cloud_name: process.env.CLOUD_NAME, 
+  api_key: process.env.API_KEY, 
+  api_secret: process.env.API_SECRET 
+});
+
+
+
+admin_students_get = async (req,res) => {
+    try{
+        const students = await Student.find().populate('user').sort({createdAt: -1}).lean() //populate هيك صار يدمج مودل اليوزر مع مودل الستودنت وبقدر اوصل لبيانات الاثنين lean سرعة في عرض البيانات sort ترتيب حسب التاريخ الاحدث فوق والاقدم تحت
+        res.locals.students = students
+        res.render("pages/admin/students/students", {moment: moment}) //moment مكتبة لتنسيق التاريخ والوقت
+
+    }
+    catch(err){
+        console.log(err)
+    }
+
+
+}
+admin_students_view_get = async (req,res) => {
+    try{
+        const student = await Student.findById(req.params.id).populate('user').lean()
+        res.locals.student = student
+        res.render("pages/admin/students/student_view", {moment: moment}) //moment مكتبة لتنسيق التاريخ والوقت
+    }
+    catch(err){
+        console.log(err)
+    }
+   
+}
+
+admin_students_edit_get = async (req,res) => {
+    try{
+        const student = await Student.findById(req.params.id).populate('user').lean()
+        res.locals.student = student
+        res.render("pages/admin/students/student_edit", {moment: moment}) //moment مكتبة لتنسيق التاريخ والوقت
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+admin_students_edit_put = async (req,res) => {
+    try{
+        const student = await Student.findById(req.params.id).populate('user')
+        //تحديث الحقول في الستيودنت سكيما 
+        const updatedStudent = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true })
+        //تحديث الحقول في اليوزر سكيما
+        const updatedUser = await User.findByIdAndUpdate(student.user._id, {
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+
+        }, { new: true })
+        res.redirect("/admin/students")
+
+
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+admin_students_delete = async (req,res) => {
+    try{
+        const student = await Student.findById(req.params.id).populate('user')
+        //حذف اليوزر من اليوزر سكيما
+        await User.findByIdAndDelete(student.user._id)
+        //حذف الستيودنت من الستيودنت سكيما
+        await Student.findByIdAndDelete(req.params.id)
+        res.redirect("/admin/students")
+
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+admin_students_status_put = async (req, res) => {
+    try {
+      const student = await Student.findById(req.params.id);
+  
+      let newStatus;
+      if (student.status === "Pending") {
+        newStatus = "Active";
+      } else if (student.status === "Active") {
+        newStatus = "Inactive";
+      } else {
+        newStatus = "Pending";
+      }
+  
+      await Student.findByIdAndUpdate(req.params.id, { status: newStatus }, { new: true });
+  
+      res.redirect("/admin/students");    
+    } catch (err) {
+      console.log(err);
+      res.redirect("/admin/students"); // حتى لو في خطأ، ما توقف الصفحة
+    }
+  }
+  admin_students_search_post = async (req, res) => {
+    try {
+      const query = req.body.query?.trim();  
+      if (!query) {
+        return res.render("pages/admin/students/student_search", { students: [], moment });
+      }
+  
+      let students = await Student.find({}).populate('user'); // بدون شروط بحث هنا
+  
+      // نفلتر النتائج بعد الـ populate
+      students = students.filter(student => {
+        const nameMatch = student.user?.name?.toLowerCase().includes(query.toLowerCase());
+        const emailMatch = student.user?.email?.toLowerCase().includes(query.toLowerCase());
+        const phoneMatch = student.phone?.toLowerCase().includes(query.toLowerCase());
+        const statusMatch = student.status?.toLowerCase().includes(query.toLowerCase());
+        return nameMatch || emailMatch || phoneMatch || statusMatch;
+      });  
+      res.render("pages/admin/students/student_search", { students, moment });
+    } catch (err) {
+      console.error("Error during student search:", err);
+      res.status(500).send("There was an error while searching.");
+    }
+  };
+  
+  admin_teachers_get = async (req,res) => {
+    try{
+      const teachers= await Teachers.find().populate('user').sort({createdAt: -1}).lean() //populate هيك صار يدمج مودل اليوزر مع مودل الستودنت وبقدر اوصل لبيانات الاثنين lean سرعة في عرض البيانات sort ترتيب حسب التاريخ الاحدث فوق والاقدم تحت
+      res.locals.teachers = teachers
+      res.render("pages/admin/teachers/teachers", {moment: moment})
+    }
+    
+    catch(err){
+        console.log(err)
+    } 
+  }
+    
+  admin_teachers_view_get = async (req,res) => {
+    try{
+      const teacher = await Teachers.findById(req.params.id).populate('user').lean()
+      res.locals.teacher = teacher
+      res.render("pages/admin/teachers/teacher_view", {moment: moment})
+
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+  admin_teachers_edit_get = async (req,res) => {
+    try{
+      const teacher = await Teachers.findById(req.params.id).populate('user').lean()
+      res.locals.teacher = teacher
+      res.render("pages/admin/teachers/teacher_edit", {moment: moment})
+
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+  admin_teachers_edit_put = async (req,res) => {
+    try{
+       const teacher = await Teachers.findById(req.params.id).populate('user')
+       //تحديث الحقول في التيتشر سكيما
+       const updatedTeachrt = await Teachers.findByIdAndUpdate(req.params.id, req.body, { new: true })
+        //تحديث الحقول في اليوزر سكيما
+        const updatedUser = await User.findByIdAndUpdate(teacher.user._id, {
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+
+        }, { new: true })
+        res.redirect("/admin/teachers")
+
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+    
+  admin_teachers_delete = async (req,res) => {
+    try{
+      const teacher = await Teachers.findById(req.params.id).populate('user')
+      //حذف اليوزر من اليوزر سكيما
+      await User.findByIdAndDelete(teacher.user._id)
+      //حذف الستيودنت من التيتشر  سكيما
+      await Teachers.findByIdAndDelete(req.params.id)
+      res.redirect("/admin/teachers")
+
+    
+
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+  admin_teachers_status_put = async (req, res) => {
+    try{
+      const teacher = await Teachers.findById(req.params.id);
+  
+      let newStatus;
+      if (teacher.status === "Pending") {
+        newStatus = "Active";
+      } else if (teacher.status === "Active") {
+        newStatus = "Inactive";
+      } else {
+        newStatus = "Pending";
+      }
+  
+      await Teachers.findByIdAndUpdate(req.params.id, { status: newStatus }, { new: true });
+  
+      res.redirect("/admin/teachers");    
+
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+  admin_teachers_search_post = async (req, res) => {
+    try {
+      const query = req.body.query?.trim();  
+      if (!query) {
+        return res.render("pages/admin/teachers/teacher_search", { teachers: [], moment });
+      }
+  
+      let teachers = await Teachers.find({}).populate('user'); // بدون شروط بحث هنا
+  
+      // نفلتر النتائج بعد الـ populate
+      teachers = teachers.filter(teacher => {
+        const nameMatch = teacher.user?.name?.toLowerCase().includes(query.toLowerCase());
+        const emailMatch = teacher.user?.email?.toLowerCase().includes(query.toLowerCase());
+        const phoneMatch = teacher.phone?.toLowerCase().includes(query.toLowerCase());
+        const statusMatch = teacher.status?.toLowerCase().includes(query.toLowerCase());
+        const expertiseMatch = teacher.expertise?.some(exp => exp.toLowerCase().includes(query.toLowerCase()));
+        return nameMatch || emailMatch || phoneMatch || statusMatch || expertiseMatch;
+      });  
+      res.render("pages/admin/teachers/teacher_search", { teachers, moment });
+    }  catch (err) {
+      console.error("Error searching teachers:", err);
+      res.status(500).send("There was an error while searching teachers.");
+    }
+  };
+  admin_add_teacher_get = async (req,res) => {
+    try{
+        res.render("pages/admin/teachers/add-teacher")
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+  admin_add_teacher_post = async (req,res) => {
+    try{
+      //فحص الايميل المدخل هل موجود مسبقا ام لا 
+      const exsistingEmail = await User.findOne({email: req.body.email})
+      if(exsistingEmail){
+        console.log("Email already exists");
+        return res.json({exsistingEmail: "Email already exists"})
+      }
+      //فحص الباسوورد هل مطابقة للشروط ام لا 
+      const objErr = validationResult(req) 
+      if(objErr.errors.length >0){
+        console.log(objErr);
+        return res.json({objErr: objErr.errors})
+      }
+      
+      //ننشئ يوزر من البيانات المدخلة
+      const newTeacher = await User.create(req.body)
+      //ننشء معلم وبرسل معه اليوزر باستخدام اليوزر الجديد
+      const teacher = await Teachers.create({user: newTeacher._id})
+      console.log("New teacher added:", teacher);
+      req.flash('success', 'Teacher added successfully'); // تخزين رسالة النجاح في الجلسة
+      return res.json({ success: true, redirectTo: "/admin/teachers" }); // Redirect the user on success
+
+
+
+    
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+admin_teachers_search_get = async (req,res) => {
+    try{
+      const teachers = await Teachers.find().populate('user').sort({createdAt: -1}).lean() //populate هيك صار يدمج مودل اليوزر مع مودل الستودنت وبقدر اوصل لبيانات الاثنين lean سرعة في عرض البيانات sort ترتيب حسب التاريخ الاحدث فوق والاقدم تحت
+      res.locals.teachers = teachers
+        res.render("pages/admin/teachers/teacher_search", {moment: moment}) //moment مكتبة لتنسيق التاريخ والوقت
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+
+  admin_add_category_get = (req,res) => {
+    res.render("pages/admin/categories/add-categorie")
+  }
+  admin_add_category_post = async (req, res) => {
+    try {
+      cloudinary.uploader.upload(req.file.path,{folder: "LMS/categoriesImge"} ,async (error, result) => {
+        if (error) {
+          console.error("Error uploading image to Cloudinary:", error);
+          return res.status(500).send("Error uploading image");
+        }
+  
+        const uploadedImage = result.secure_url; // رابط الصورة المرفوعة
+        req.body.image = uploadedImage; // إضافة رابط الصورة إلى البيانات المدخلة
+        //التاكد من عدم تكرار الاسم 
+        const existingCategory = await Category.findOne({ name: req.body.name });
+        if (existingCategory) {
+          console.log("Category name already exists");
+          //اظهار رسالة الخطا للمسخدم في الواجهة
+          req.flash('error', 'Category name already exists'); // تخزين رسالة الخطأ في الجلسة
+          return res.redirect('/admin/categories/add-category'); // إعادة التوجيه مع رسالة الخطأ
+        }
+        const newCategory = await Category.create({
+          name: req.body.name,
+          description: req.body.description,
+          image: uploadedImage,
+        });
+        fs.unlinkSync(req.file.path); // حذف الملف المؤقت
+        //اظهار رسالة النجاح للمستخدم في الفرونت
+        req.flash('success', 'Category added successfully'); // تخزين رسالة النجاح في الجلسة
+
+
+        console.log("New category added:", newCategory);
+        res.redirect("/admin/categories");
+      });
+  
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Error while adding category");
+    }
+  };
+  admin_categories_get = async (req,res) => {
+    try{
+      const categories = await Category.find().sort({createdAt: -1}).lean() // هlean سرعة في عرض البيانات sort ترتيب حسب التاريخ الاحدث فوق والاقدم تحت
+      res.locals.categories = categories
+        res.render("pages/admin/categories/categories", {moment: moment}) //moment مكتبة لتنسيق التاريخ والوقت
+
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+  admin_categories_view_get = async (req,res) => {
+    try{
+      const category = await Category.findById(req.params.id).lean()
+      res.locals.category = category
+      res.render("pages/admin/categories/categories_view", {moment: moment}) //moment مكتبة لتنسيق التاريخ والوقت
+
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+  admin_categories_edit_get = async (req,res) => {
+    try{
+      const category = await Category.findById(req.params.id).lean()
+      res.locals.category = category
+      res.render("pages/admin/categories/categories_edite", {moment: moment}) //moment مكتبة لتنسيق التاريخ والوقت
+
+    }
+    catch(err){
+        console.log(err)
+    }
+
+  }
+  admin_categories_edit_put = async (req,res) => {
+    try{
+      const category = await Category.findById(req.params.id)
+      //فحص اذا تم رفع صورة جديدة ام لا 
+      if(req.file){
+        cloudinary.uploader.upload(req.file.path,{folder: "LMS/categoriesImge"} ,async (error, result) => {
+          if (error) {
+            console.error("Error uploading image to Cloudinary:", error);
+            return res.status(500).send("Error uploading image");
+          }
+          const uploadedImage = result.secure_url; // رابط الصورة المرفوعة
+          req.body.image = uploadedImage; // إضافة رابط الصورة إلى البيانات المدخلة
+          const updatedCategory = await Category.findByIdAndUpdate(req.params.id, {
+            name: req.body.name,
+            description: req.body.description,
+            status: req.body.status,
+            image: uploadedImage,
+          }, { new: true });
+          fs.unlinkSync(req.file.path); // حذف الملف المؤقت
+          res.redirect("/admin/categories")
+        });
+      }else{
+        //اذا لم يتم تحديث الصورة حدث هدول وبس
+        const updatedCategory = await Category.findByIdAndUpdate(req.params.id, {
+          name: req.body.name,
+          description: req.body.description,
+          status: req.body.status,
+        }, { new: true });
+        res.redirect("/admin/categories")
+      }
+
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+  admin_categories_delete = async (req,res) => {
+    try{
+      const category = await Category.findById(req.params.id)
+      //حذف الصورة من الكلاودنري
+      const publicId = category.image.split('/').pop().split('.')[0]; // استخراج الـ public_id من رابط الصورة
+      await cloudinary.uploader.destroy(`LMS/categoriesImge/${publicId}`); // حذف الصورة من Cloudinary
+      //حذف الفئة من قاعدة البيانات
+      await Category.findByIdAndDelete(req.params.id)
+      res.redirect("/admin/categories")
+
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+  admin_categories_status_put = async (req, res) => {
+    try{
+      const categorie = await Category.findById(req.params.id);
+      if(categorie.status === "Active"){
+        await Category.findByIdAndUpdate(req.params.id, { status: "Inactive" }, { new: true });
+      } else {
+        await Category.findByIdAndUpdate(req.params.id, { status: "Active" }, { new: true });
+      }
+      res.redirect("/admin/categories");
+
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+  admin_categories_search_get = async (req,res) => {
+    try{
+      const categories = await Category.find().sort({createdAt: -1}).lean() //populate هيك صار يدمج مودل اليوزر مع مودل الستودنت وبقدر اوصل لبيانات الاثنين lean سرعة في عرض البيانات sort ترتيب حسب التاريخ الاحدث فوق والاقدم تحت
+      res.locals.categories = categories
+        res.render("pages/admin/categories/categories_search", {moment: moment}) //moment مكتبة لتنسيق التاريخ والوقت
+
+
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+  
+  admin_categories_search_post = async (req, res) => {
+    try{
+      const query = req.body.query?.trim()
+      if (!query) {
+        return res.render("pages/admin/categories/categories_search", { categories: [], moment });
+      }
+
+
+      const categories = await Category.find({
+        $or: [
+          { name: { $regex: query, $options: 'i' } },
+          { description: { $regex: query, $options: 'i' } },
+         
+        ]
+      }).sort({ createdAt: -1 }).lean();
+      res.render("pages/admin/categories/categories_search", { categories, moment });
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+
+  admin_pending_courses_get = async (req, res) => {
+    try {
+      const courses = await Course.find({ status: "Under Review" }).populate({
+        path: 'teacher',
+        populate: {
+          path: 'user',
+          select: 'name',  // تأكد من جلب الاسم فقط
+          model: 'User'    // تحديد نموذج المستخدم بشكل صريح
+        }
+      }).sort({ createdAt: -1 }).lean(); 
+      courses.forEach((course, i) => {
+        if (!course.teacher) {
+          console.log(`Course ${i} is missing teacher`);
+        } else if (!course.teacher.user) {
+          console.log(`Course ${i} teacher is missing user`);
+        } else {
+          console.log(`Course ${i} => ${course.teacher.user.name}`);
+        }
+      }); // استخدام lean للحصول على بيانات جافة (JSON)
+  
+      console.log(courses);  // تحقق من أن الكورسات تحتوي على معلمين وبيانات المستخدمين
+      res.render("pages/admin/courses/pending-courses", { courses, moment });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  admin_pending_courses_view_get = async (req, res) => {
+    try{
+      const course = await Course.findById(req.params.id).populate({
+        path: 'teacher',
+        populate: {
+          path: 'user',
+          select: 'name',
+          model: 'User'
+        }
+      });
+      res.render("pages/admin/courses/pending-course-view", { course, moment });
+
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+  
+  admin_pending_courses_publish_put = async (req, res) => {
+    try{
+      const course = await Course.findByIdAndUpdate(req.params.id, {
+        status: "Published"
+      }, { new: true });
+      req.flash('success', 'Course published successfully');    
+      res.redirect("/admin/pending-courses");
+
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+
+  admin_pending_courses_reject_put = async (req, res) => {
+    try{
+      const course = await Course.findByIdAndUpdate(req.params.id, {
+        status: "Rejected",
+        rejectionReason: req.body.rejectionReason
+      }, { new: true });
+      req.flash('success', 'Course rejected successfully');    
+      res.redirect("/admin/pending-courses");
+
+    }
+    catch(err){
+      console.log(err);
+    }
+
+  }
+
+  admin_courses_get = async (req,res) => {
+    try{
+      const courses = await Course.find().populate({
+        path: 'teacher',
+        populate: {
+          path: 'user',
+          select: 'name',  // تأكد من جلب الاسم فقط
+          model: 'User'    // تحديد نموذج المستخدم بشكل صريح
+        }
+      }).sort({ createdAt: -1 }).lean(); 
+         res.render("pages/admin/courses/courses", { courses, moment });
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+  admin_courses_view_get = async (req,res) => {
+    try{
+      const course = await Course.findById(req.params.id).populate({
+
+        path: 'teacher',
+        populate: {
+          path: 'user',
+          select: 'name',
+          model: 'User'
+        }
+      });
+      res.render("pages/admin/courses/course-view", { course, moment });
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+  admin_courses_lessons_get = async (req,res) => {
+    try{
+      const lessons = await Lesson.find({ course: req.params.id }).populate('course').sort({ createdAt: -1 }).lean();
+      const course = await Course.findById(req.params.id);
+    
+      res.render("pages/admin/courses/course-lesoons", { course, lessons, moment });
+    } catch(err) {
+      console.log(err);
+    }
+  }
+  admin_courses_search_get = async (req,res) => {
+    try{
+      const courses = await Course.find().populate({
+
+        path: 'teacher',
+        populate: {
+          path: 'user',
+          select: 'name',
+          model: 'User'
+        }
+      }).sort({ createdAt: -1 }).lean();
+      res.render("pages/admin/courses/courses", { courses, moment });
+    }
+    catch(err){
+        console.log(err)
+    }
+  }
+  admin_courses_search_post = async (req, res) => {
+    try {
+      const query = req.body.query?.trim();  
+      if (!query) {
+        return res.redirect("/admin/courses");
+      }
+  
+      const courses = await Course.find({
+        $or: [
+          { title: { $regex: query, $options: 'i' } },
+          { description: { $regex: query, $options: 'i' } },
+          { status: { $regex: query, $options: 'i' } },
+         
+        ]
+      }).populate({
+        path: 'teacher',
+        populate: {
+          path: 'user',
+          select: 'name',
+          model: 'User'
+        }
+      }).populate('category').sort({ createdAt: -1 }).lean(); // استخدام populate لجلب بيانات المعلم والفئة
+      // ✅ فلترة النتائج حسب اسم المعلم
+const filteredCourses = courses.filter(course =>
+  course.teacher?.user?.name?.toLowerCase().includes(query.toLowerCase()) ||
+  course.category?.name?.toLowerCase().includes(query.toLowerCase())
+);
+      res.render("pages/admin/courses/course-serch", { courses, filteredCourses, moment });
+    }
+    catch (err) {
+      console.error("Error searching courses:", err);
+    }
+  }
+
+  admin_courses_status_put = async (req, res) => {
+    try{
+      const course = await Course.findOne({ _id: req.params.id });
+      if (!course) {
+        return res.status(404).send("Course not found");
+      }
+      let newStatus;
+      if (course.status === "Published") {
+        newStatus = "Closed";
+      } else if (course.status === "Closed") {
+        newStatus = "Published";
+      } else {
+        req.flash("error", "Cannot change course status from this state.");
+      }
+      course.status = newStatus;
+      await course.save();
+      req.flash('success', `Course status updated to ${newStatus}`); // تخزين رسالة النجاح في الجلسة
+      res.redirect("/admin/courses"); 
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+  admin_pending_lessons_get = async (req,res) => {
+    try{
+      const lessons = await Lesson.find({ status: "Under Review" }).populate({
+        path: 'course',
+        select: 'title teacher',
+        populate: {
+          path: 'teacher',
+          populate: {
+            path: 'user',
+            select: 'name'
+          }
+        }
+      }).sort({ createdAt: -1 }).lean(); 
+      res.render("pages/admin/courses/pending-lessons", { lessons, moment });
+    }      
+    catch(err){
+        console.log(err)
+    }
+  }
+  admin_pending_lessons_view_get = async (req,res) => {
+    try{
+      const lesson = await Lesson.findById(req.params.id).populate({
+
+        path: 'course',
+        select: 'title teacher',
+        populate: {
+          path: 'teacher',
+          populate: {
+            path: 'user',
+            select: 'name'
+          }
+        }
+      });
+      res.render("pages/admin/courses/pending-lessons-view", { lesson, moment });
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+  admin_pending_lessons_publish_put = async (req,res) => {
+    try{
+      const lesson = await Lesson.findByIdAndUpdate(req.params.id, {
+        status: "Published"
+      }, { new: true });
+      req.flash('success', 'Lesson published successfully');    
+      res.redirect("/admin/pending-lessons");
+
+    }
+    catch(err){
+      console.log(err);
+    }
+
+  }
+  admin_pending_lessons_reject_put = async (req,res) => {
+    try{
+      const lesson = await Lesson.findByIdAndUpdate(req.params.id, {
+        status: "Rejected",
+        rejectionReason: req.body.rejectionReason
+      }, { new: true });
+      req.flash('success', 'Lesson rejected successfully');    
+      res.redirect("/admin/pending-lessons");
+
+    }
+    catch(err){
+      console.log(err);
+    }
+
+  }
+
+  admin_courses_lessons_view_get = async (req,res) => {
+    try{
+      const lesson = await Lesson.findById(req.params.id).populate({
+
+        path: 'course',
+        select: 'title teacher',
+        populate: {
+          path: 'teacher',
+          populate: {
+            path: 'user',
+            select: 'name'
+          }
+        }
+      });
+      res.render("pages/admin/courses/course-lesson-view", { lesson, moment });
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+
+  admin_course_lessons_reject_put = async (req,res) => {
+    try{
+      const lesson = await Lesson.findByIdAndUpdate(req.params.id, {
+        status: "Rejected",
+        rejectionReason: req.body.rejectionReason
+      }, { new: true });
+      req.flash('success', 'Lesson rejected successfully');    
+      res.redirect("/admin/courses");
+
+    }
+    catch(err){
+      console.log(err);
+
+
+    }
+  }
+module.exports= {
+ 
+    admin_students_get,
+    admin_students_view_get,
+    admin_students_edit_get,
+    admin_students_edit_put,
+    admin_students_delete,
+    admin_students_status_put,
+    admin_students_search_post,
+    admin_teachers_get,
+    admin_teachers_view_get,
+    admin_teachers_edit_get,
+    admin_teachers_edit_put,
+    admin_teachers_delete,    
+    admin_teachers_status_put,  
+    admin_teachers_search_post, 
+    admin_add_teacher_get,
+    admin_add_teacher_post,
+    admin_teachers_search_get,
+    admin_add_category_get,
+    admin_add_category_post,
+    admin_categories_get,
+    admin_categories_view_get,
+    admin_categories_edit_get,
+    admin_categories_edit_put,
+    admin_categories_delete,
+    admin_categories_status_put,
+    admin_categories_search_get,
+    admin_categories_search_post,
+    admin_pending_courses_get,
+    admin_pending_courses_view_get,
+    admin_pending_courses_publish_put,
+    admin_pending_courses_reject_put,
+    admin_courses_get,
+    admin_courses_view_get,
+    admin_courses_lessons_get,
+    admin_courses_search_get,
+    admin_courses_search_post,
+    admin_courses_status_put,
+    admin_pending_lessons_get,
+    admin_pending_lessons_view_get,
+    admin_pending_lessons_publish_put,
+    admin_pending_lessons_reject_put,
+    admin_courses_lessons_view_get,
+    admin_course_lessons_reject_put,
+   }

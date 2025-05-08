@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- ***** Heade Area Start ***** -->
+   <%- include('partials/indexPartials/heade.ejs') %>
+  <!-- ***** Heade Area End ***** -->
+<body>
+
+  <!-- ***** Preloader Start ***** -->
+  <div id="js-preloader" class="js-preloader">
+    <div class="preloader-inner">
+      <span class="dot"></span>
+      <div class="dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+  <!-- ***** Preloader End ***** -->
+
+  <!-- ***** Header Area Start ***** -->
+ <%- include('partials/indexPartials/header.ejs') %>
+  <!-- ***** Header Area End ***** -->
+
+    <!-- ***** Top Area Start ***** -->
+<%- include('partials/indexPartials/top.ejs') %>
+    <!-- ***** Top Area End ***** -->
+
+ <!-- ***** services Area Start ***** -->
+
+  <%- include('partials/indexPartials/services.ejs') %>
+ <!-- ***** services Area End ***** -->
+
+  <!-- ***** about-us Area Start ***** -->
+
+  <%- include('partials/indexPartials/about-us.ejs') %>
+   <!-- ***** about-us Area End ***** -->
+
+  <!-- ***** courses Area Start ***** -->
+<%- include('partials/indexPartials/courses.ejs') %>
+  <!-- ***** courses Area End ***** -->
+
+    <!-- ***** facts Area Start ***** -->
+
+  <%- include('partials/indexPartials/facts.ejs') %>
+    <!-- ***** facts Area End ***** -->
+
+
+        <!-- ***** teams Area Start ***** -->
+
+<%- include('partials/indexPartials/teams.ejs') %>
+        <!-- ***** teams Area End ***** -->
+
+  <!-- ***** testimonials Area Start ***** -->
+
+<%- include('partials/indexPartials/testimonials.ejs') %>
+        <!-- ***** testimonials Area End ***** -->
+
+
+ <!-- ***** events Area Start ***** -->
+
+<%- include('partials/indexPartials/events.ejs') %>
+  <!-- ***** events Area End ***** -->
+
+   <!-- ***** contact Area Start ***** -->
+
+<%- include('partials/indexPartials/contact.ejs') %>
+   <!-- ***** contact Area End ***** -->
+
+      <!-- ***** footer Area Start ***** -->
+
+  <%- include('partials/indexPartials/footer.ejs') %>
+   <!-- ***** footer Area End ***** -->
+
+  <!-- Scripts -->
+  <!-- Bootstrap core JavaScript -->
+ 
+  <script>
+    function toggleLoginDropdown(event) {
+      event.preventDefault();
+      const dropdown = event.target.closest('.login-dropdown');
+      dropdown.classList.toggle('open');
+    }
+  </script>
+  
+  
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+  <script src="assets/js/isotope.min.js"></script>
+  <script src="assets/js/owl-carousel.js"></script>
+  <script src="assets/js/counter.js"></script>
+  <script src="assets/js/custom.js"></script>
+
+
+  </body>
+</html>

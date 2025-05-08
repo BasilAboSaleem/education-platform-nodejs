@@ -1,0 +1,56 @@
+<div class="main-panel">
+  <div class="content-wrapper">
+    <% if (success && success.length > 0) { %>
+      <div class="alert alert-success" id="flash-success">
+        <%= success[0] %>
+      </div>
+    <% } %>
+    
+    <% if (error && error.length > 0) { %>
+      <div class="alert alert-danger" id="flash-error">
+        <%= error[0] %>
+      </div>
+    <% } %>
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="home-tab">
+          <!--tabs-and-buttons partials/starAdminpartials/main-panel/taps.ejs -->
+          <%- include('./main-panel/taps.ejs') %>
+
+            <div class="tab-content tab-content-basic">
+              <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
+                <!-- الاحصائيات partials/starAdminpartials/main-panel//stats.ejs-->
+                <%- include('./main-panel/stats.ejs') %>
+
+
+                  <div class="row">
+                    <div class="col-lg-8 d-flex flex-column">
+                      <!-- التحلايات partials/starAdminpartials/main-panel/analytics.ejs-->
+
+                      <%- include('./main-panel/analytics.ejs') %>
+                        <!-- النشاطات partials/starAdminpartials/main-panel/activityRequests.ejs-->
+
+                        <%- include('./main-panel/activityRequests.ejs') %>
+                    </div>
+                    <div class="col-lg-4 d-flex flex-column">
+                      <!-- قائمة الواجبات partials/starAdminpartials/main-panel/toDoList.ejs-->
+
+                      <%- include('./main-panel/toDoList.ejs') %>
+                        <!-- المخطط المالي partials/starAdminpartials/main-panel/amount.ejs-->
+
+                        <%- include('./main-panel/amount.ejs') %>
+
+
+                    </div>
+                  </div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- content-wrapper ends -->
+  <!-- partial:partials/starAdminpartials/footer.ejs -->
+  <%- include('./_footer.ejs') %>
+    <!-- partial -->
+</div>

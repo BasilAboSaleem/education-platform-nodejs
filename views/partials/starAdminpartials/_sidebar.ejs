@@ -1,0 +1,288 @@
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+  <ul class="nav">
+    <!-- Dashboard -->
+    <li class="nav-item">
+      <a class="nav-link" href="/dashboard">
+        <i class="mdi mdi-grid-large menu-icon"></i>
+        <span class="menu-title">Dashboard</span>
+      </a>
+    </li>
+    <% if (user.role==="Admin" ) { %>
+
+      <li class="nav-item nav-category">Users Management</li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/students">
+          <i class="menu-icon mdi mdi-account-multiple"></i>
+          <span class="menu-title">Students</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/teachers">
+          <i class="menu-icon mdi mdi-school"></i>
+          <span class="menu-title">Teachers</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/add-teacher">
+          <i class="menu-icon mdi mdi-account-plus"></i>
+          <span class="menu-title">Add Teacher</span>
+        </a>
+      </li>
+
+      <!-- Courses -->
+      <li class="nav-item nav-category">Courses</li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/courses">
+          <i class="menu-icon mdi mdi-book-open-variant"></i>
+          <span class="menu-title">All Courses</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/pending-courses">
+          <i class="menu-icon mdi mdi-clock-outline"></i>
+          <span class="menu-title">Pending Courses</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/pending-lessons">
+          <i class="menu-icon mdi mdi-clock-outline"></i>
+          <span class="menu-title">Pending Lessons</span>
+        </a>
+      </li>
+<!-- Categories -->
+<li class="nav-item nav-category">Categories</li>
+<li class="nav-item">
+  <a class="nav-link" href="/admin/categories">
+    <i class="menu-icon mdi mdi-format-list-bulleted"></i>
+    <span class="menu-title">All Categories</span>
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="/admin/categories/add-category">
+    <i class="menu-icon mdi mdi-plus-box"></i>
+    <span class="menu-title">Add Category</span>
+  </a>
+</li>
+      <!-- Payments -->
+      <li class="nav-item nav-category">Payments</li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/payments">
+          <i class="menu-icon mdi mdi-cash-multiple"></i>
+          <span class="menu-title">Payment Reports</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/earnings">
+          <i class="menu-icon mdi mdi-chart-bar"></i>
+          <span class="menu-title">Platform Earnings</span>
+        </a>
+      </li>
+
+      <!-- Notifications -->
+      <li class="nav-item nav-category">Communication</li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/notifications">
+          <i class="menu-icon mdi mdi-bell-outline"></i>
+          <span class="menu-title">Send Notification</span>
+        </a>
+      </li>
+
+      <!-- System Settings -->
+      <li class="nav-item nav-category">Settings</li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/settings">
+          <i class="menu-icon mdi mdi-cog-outline"></i>
+          <span class="menu-title">System Settings</span>
+        </a>
+      </li>
+
+
+
+      <% } %>
+
+
+        <% if (user.role==="Student" ) { %>
+
+          <!-- My Courses -->
+          <li class="nav-item nav-category">Courses</li>
+          <li class="nav-item">
+            <a class="nav-link" href="/student/my-courses">
+              <i class="menu-icon mdi mdi-playlist-check"></i>
+              <span class="menu-title">My Courses</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/student/all-courses">
+              <i class="menu-icon mdi mdi-book-search-outline"></i>
+              <span class="menu-title">Explore Courses</span>
+            </a>
+          </li>
+
+          <!-- Payment -->
+          <li class="nav-item nav-category">Payments</li>
+          <li class="nav-item">
+            <a class="nav-link" href="/student/payments">
+              <i class="menu-icon mdi mdi-credit-card-outline"></i>
+              <span class="menu-title">My Payments</span>
+            </a>
+          </li>
+
+          <!-- Profile -->
+          <li class="nav-item nav-category">Profile</li>
+          <li class="nav-item">
+            <a class="nav-link" href="/student/profile">
+              <i class="menu-icon mdi mdi-account-edit-outline"></i>
+              <span class="menu-title">Edit Profile</span>
+            </a>
+          </li>
+
+          <% } %>
+
+            <% if (user.role==="Teacher" ) { %>
+
+              <!-- Course Management -->
+              <li class="nav-item nav-category">Course Management</li>
+              <li class="nav-item">
+                <a class="nav-link" href="/teacher/courses">
+                  <i class="menu-icon mdi mdi-book-outline"></i>
+                  <span class="menu-title">My Courses</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/teacher/add-course">
+                  <i class="menu-icon mdi mdi-plus-box-outline"></i>
+                  <span class="menu-title">Add New Course</span>
+                </a>
+              </li>
+
+              <!-- Enrollments -->
+              <li class="nav-item nav-category">Enrollments</li>
+              <li class="nav-item">
+                <a class="nav-link" href="/teacher/enrollments">
+                  <i class="menu-icon mdi mdi-account-multiple-outline"></i>
+                  <span class="menu-title">Student Enrollments</span>
+                </a>
+              </li>
+
+              <!-- Profile -->
+              <li class="nav-item nav-category">Profile</li>
+              <li class="nav-item">
+                <a class="nav-link" href="/teacher/profile">
+                  <i class="menu-icon mdi mdi-account-edit-outline"></i>
+                  <span class="menu-title">Edit Profile</span>
+                </a>
+              </li>
+
+
+
+              <% } %>
+                <!-- Logout -->
+                <li class="nav-item nav-category">Account</li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/logout">
+                    <i class="menu-icon mdi mdi-logout"></i>
+                    <span class="menu-title">Logout</span>
+                  </a>
+                </li>
+  </ul>
+</nav>
+
+
+
+<!-- basic sidebar for template 
+
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+  <ul class="nav">
+    <li class="nav-item">
+      <a class="nav-link" href="../index.html">
+        <i class="mdi mdi-grid-large menu-icon"></i>
+        <span class="menu-title">Dashboard</span>
+      </a>
+    </li>
+    <li class="nav-item nav-category">UI Elements</li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+        <i class="menu-icon mdi mdi-floor-plan"></i>
+        <span class="menu-title">UI Elements</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="ui-basic">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item"> <a class="nav-link" href="../pages/ui-features/buttons.html">Buttons</a></li>
+          <li class="nav-item"> <a class="nav-link" href="../pages/ui-features/dropdowns.html">Dropdowns</a></li>
+          <li class="nav-item"> <a class="nav-link" href="../pages/ui-features/typography.html">Typography</a></li>
+        </ul>
+      </div>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
+        <i class="menu-icon mdi mdi-card-text-outline"></i>
+        <span class="menu-title">Form elements</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="form-elements">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item"><a class="nav-link" href="../pages/forms/basic_elements.html">Basic Elements</a></li>
+        </ul>
+      </div>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
+        <i class="menu-icon mdi mdi-chart-line"></i>
+        <span class="menu-title">Charts</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="charts">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item"> <a class="nav-link" href="../pages/charts/chartjs.html">ChartJs</a></li>
+        </ul>
+      </div>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
+        <i class="menu-icon mdi mdi-table"></i>
+        <span class="menu-title">Tables</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="tables">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item"> <a class="nav-link" href="../pages/tables/basic-table.html">Basic table</a></li>
+        </ul>
+      </div>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons">
+        <i class="menu-icon mdi mdi-layers-outline"></i>
+        <span class="menu-title">Icons</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="icons">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item"> <a class="nav-link" href="../pages/icons/font-awesome.html">Font Awesome</a></li>
+        </ul>
+      </div>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+        <i class="menu-icon mdi mdi-account-circle-outline"></i>
+        <span class="menu-title">User Pages</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="auth">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item"> <a class="nav-link" href="../pages/samples/blank-page.html"> Blank Page </a></li>
+          <li class="nav-item"> <a class="nav-link" href="../pages/samples/error-404.html"> 404 </a></li>
+          <li class="nav-item"> <a class="nav-link" href="../pages/samples/error-500.html"> 500 </a></li>
+          <li class="nav-item"> <a class="nav-link" href="../pages/samples/login.html"> Login </a></li>
+          <li class="nav-item"> <a class="nav-link" href="../pages/samples/register.html"> Register </a></li>
+        </ul>
+      </div>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="../docs/documentation.html">
+        <i class="menu-icon mdi mdi-file-document"></i>
+        <span class="menu-title">Documentation</span>
+      </a>
+    </li>
+  </ul>
+</nav>-->

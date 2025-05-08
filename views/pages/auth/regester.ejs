@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Scholar</title>
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/fontawesome.css" />
+    <link rel="stylesheet" href="assets/css/templatemo-scholar.css" />
+    <link rel="stylesheet" href="assets/css/owl.css" />
+    <link rel="stylesheet" href="assets/css/animate.css" />
+    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
+    <style>
+      #emailError,
+      #passwordError {
+        color: #ff5d79;
+        margin-left: 0.4rem;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header Start -->
+    <header class="header-area header-sticky">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <nav class="main-nav">
+              <a href="index.html" class="logo">
+                <h1>Scholar</h1>
+              </a>
+              <ul class="nav">
+                <li class="scroll-to-section"><a href="/" class="active">Home</a></li>
+                <li><a href="/login" class="btn btn-outline-primary">Login</a></li>
+              </ul>
+              <a class="menu-trigger">
+                <span>Menu</span>
+              </a>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- Header End -->
+
+    <!-- Register Section Start -->
+    <section class="register py-5" style="background-color: #f9f9f9;">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-6">
+            <div class="card shadow p-4">
+              <h4 class="text-center mb-4">Create an Account</h4>
+              <form action="/register" method="POST" id="registerForm">
+                <div class="mb-3">
+                  <label for="name" class="form-label">Full Name</label>
+                  <input type="text" class="form-control" id="nameId" name="name" required />
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email address</label>
+                  <input type="email" class="form-control" id="emailId" name="email" required />
+                  <span id="emailError" ></span> <!-- عنصر لعرض الخطأ -->
+
+                </div>
+                <div class="mb-3">
+                  <label for="password" class="form-label">Password</label>
+                  <input type="password" class="form-control" id="passwordId" name="password" required />
+                  <span id="passwordError" ></span> <!-- عنصر لعرض الخطأ -->
+
+                </div>
+                <div class="mb-3">
+                  <label for="role" class="form-label">Register as</label>
+                  <select class="form-select" id="role" name="role" required>
+                    <option value="Student">Student</option>
+                    <option value="Teacher">Teacher</option>
+                    <option value="Admin">Admin</option>
+                  </select>
+                </div>
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-primary">Register</button>
+                </div>
+                <p class="text-center mt-3">
+                  Already have an account?
+                  <a href="/login">Login here</a>
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Register Section End -->
+
+    <!-- Scripts -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/isotope.min.js"></script>
+    <script src="assets/js/owl-carousel.js"></script>
+    <script src="assets/js/counter.js"></script>
+    <script src="assets/js/custom.js"></script>
+    <script>
+      const form = document.getElementById("registerForm");
+    
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+    
+        // إخفاء الأخطاء القديمة
+        document.getElementById("emailError").textContent = "";
+        document.getElementById("passwordError").textContent = "";
+    
+        const formData = {
+          name: document.getElementById("nameId").value,
+          email: document.getElementById("emailId").value,
+          password: document.getElementById("passwordId").value,
+          role: document.getElementById("role").value // إضافة قيمة الدور
+        };
+    
+        const res = await fetch("/register", {
+          method: "POST",
+          body: JSON.stringify(formData),
+          headers: { "Content-Type": "application/json" },
+        });
+    
+        const data = await res.json();
+    
+        // إذا كانت هناك أخطاء في الاستجابة
+        if (data.objErr) {
+          console.log(data.objErr);
+          data.objErr.forEach(item => {
+            if (item.path === "email") {
+              document.getElementById("emailError").textContent = "Please provide a valid email";
+            }
+            if (item.path === "password") {
+              document.getElementById("passwordError").textContent = "Password must be at least 8 characters with 1 uppercase letter and 1 number";
+            }
+          });
+        }
+    
+        // إذا كان البريد الإلكتروني موجود بالفعل
+        if (data.existEmail) {
+          document.getElementById("emailError").textContent = "Email already exists, try to login";
+        }
+    
+        // إذا كانت الاستجابة تحتوي على success و redirectTo
+        if (data.success && data.redirectTo) {
+          window.location.href = data.redirectTo; // إعادة التوجيه إلى صفحة تسجيل الدخول
+        }
+      });
+    </script>
+    
+  </body>
+</html>

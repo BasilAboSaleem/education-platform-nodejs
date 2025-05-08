@@ -1,0 +1,55 @@
+<% if (user.role === 'Admin' || user.role === 'Teacher') { %>
+    <div class="row flex-grow">
+      <div class="col-12 grid-margin stretch-card">
+        <div class="card card-rounded">
+          <div class="card-body">
+            <div class="d-sm-flex justify-content-between align-items-start">
+              <div>
+                <% if (user.role === 'Admin') { %>
+                  <h4 class="card-title card-title-dash">Platform Statistics</h4>
+                  <p class="card-subtitle card-subtitle-dash">Overview of user and course activity</p>
+                <% } else if (user.role === 'Teacher') { %>
+                  <h4 class="card-title card-title-dash">Earnings Overview</h4>
+                  <p class="card-subtitle card-subtitle-dash">Track your monthly performance</p>
+                <% } %>
+              </div>
+              <div>
+                <div class="dropdown">
+                  <button class="btn btn-light dropdown-toggle toggle-dark btn-lg mb-0 me-0" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown">
+                    This month
+                  </button>
+                  <div class="dropdown-menu">
+                    <h6 class="dropdown-header">Select Period</h6>
+                    <a class="dropdown-item" href="#">This Week</a>
+                    <a class="dropdown-item" href="#">This Month</a>
+                    <a class="dropdown-item" href="#">Last 3 Months</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <!-- محتوى البيانات -->
+            <div class="d-sm-flex align-items-center mt-1 justify-content-between">
+              <div class="d-sm-flex align-items-center mt-4 justify-content-between">
+                <% if (user.role === 'Admin') { %>
+                  <h2 class="me-2 fw-bold">$120,450.00</h2>
+                  <h4 class="me-2">Total Revenue</h4>
+                <% } else if (user.role === 'Teacher') { %>
+                  <h2 class="me-2 fw-bold">$4,520.00</h2>
+                  <h4 class="me-2">Your Earnings</h4>
+                <% } %>
+                <h4 class="text-success">(+2.1%)</h4>
+              </div>
+              <div class="me-3">
+                <div id="marketingOverview-legend"></div>
+              </div>
+            </div>
+            <div class="chartjs-bar-wrapper mt-3">
+              <canvas id="marketingOverview"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% } %>
+  
