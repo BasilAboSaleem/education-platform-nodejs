@@ -68,11 +68,12 @@ https://templatemo.com/tm-586-scholar
         <form action="/student/all-courses/course/<%= course._id %>/enroll" method="post">
           <button type="submit" class="btn btn-primary mt-3">
             <% if (course.price === 0) { %> Enroll Now <% } %>
+            <% if (course.price > 0) { %> Buy Now <% } %>
+
+             
           </button>
         </form>
-        <% if (course.price > 0) { %>
-          <a href="/student/course/<%= course._id %>/payment" class="btn btn-primary mt-3">Buy Now</a>
-        <% } %>
+      
         
       </div>
     </div>

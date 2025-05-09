@@ -4,6 +4,7 @@ const Teachers = require("../models/teacher");
 const Course = require("../models/course");
 const Lesson = require("../models/lesson");
 const Category = require("../models/Category");
+const Enrollment = require("../models/enrollment");
 
 const { check, validationResult } = require("express-validator");
 const bcrypt = require('bcrypt');
@@ -15,6 +16,7 @@ const cloudinary = require("cloudinary").v2;
 require('dotenv').config();
 const fs = require('fs');
 const teacher = require("../models/teacher");
+const path = require("path");
  // Configuration cloudinary اعدادات الكلاودنري
  cloudinary.config({ 
     cloud_name: process.env.CLOUD_NAME, 
@@ -40,7 +42,7 @@ teacher_addCourse_get = async (req, res) => {
     }
 
 }
-const teacher_addCourse_post = async (req, res) => {
+teacher_addCourse_post = async (req, res) => {
     try {
         cloudinary.uploader.upload(req.file.path, { folder: "LMS/courses" }, async (err, result) => {
             if (err) {
@@ -315,7 +317,37 @@ teacher_course_status_put = async (req, res) => {
         console.log(err);
     }
 }
-
+teacher_student_enrollments_get = async (req, res) => {
+    try {
+      const teacher = await Teachers.findOne({user: req.user.id}) // المعلم الحالي 
+  
+      const studentEnrollments = await Enrollment.find()
+        .populate({
+          path: "course",
+          match: { teacher: teacher._id }, // فلترة الكورسات التي تخص المعلم فقط يعني شرط
+        })
+        .populate({
+          path: "student",
+          populate: {
+            path: "user",
+            model: "User",
+            select: "name email",
+          },
+        });
+  
+      // فلترة النتائج لإزالة الاشتراكات التي لم تطابق الشرط (يعني course = null)
+      const filteredEnrollments = studentEnrollments.filter(e => e.course !== null);
+  
+      res.render("pages/teacher/studentEnrollments", {
+        studentEnrollments: filteredEnrollments,
+        moment: moment,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Internal Server Error");
+    }
+  };
+  
 module.exports = {
     teacher_addCourse_get,
     teacher_addCourse_post,
@@ -331,4 +363,5 @@ module.exports = {
     teacher_course_lesson_edit_put,
     teacher_course_status_put,
     teacher_course_delete,
+    teacher_student_enrollments_get,
 };

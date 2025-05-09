@@ -125,12 +125,14 @@ student_allCourses_courseDetails_get = async (req, res) => {
 student_enroll_course_post = async (req, res) => {
   try {
     const courseId = req.params.id; // الحصول على الـ id من الرابط
-    const studentId = req.user._id; // الحصول على الـ id الخاص بالطالب من التوكن
+    const userId = req.user._id; // الحصول على الـ id الخاص بالطالب من التوكن
+    // الان بدنا نجيب الطالب المرتبط باليوزر student_.id
+    const student = await Student.findOne({ user: userId }); // جلب الطالب المرتبط باليوزر
     const course = await Course.findById(courseId); // جلب الكورس
 
     // التحقق مما إذا كان الطالب مسجلاً في الكورس بالفعل
     const existingEnrollment = await Enrollment.findOne({
-      student: studentId,
+      student: student._id,
       course: courseId,
     });
     if (existingEnrollment) {
@@ -140,7 +142,7 @@ student_enroll_course_post = async (req, res) => {
 
     // إنشاء تسجيل جديد
     const enrollment = await Enrollment.create({
-      student: studentId,
+      student: student._id,
       course: courseId,
     });
     if (course.price > 0) {
@@ -152,7 +154,7 @@ student_enroll_course_post = async (req, res) => {
         "You have successfully enrolled in the course. Please proceed to payment."
       );
       //تحويل الطالب لصفحة الدفع
-      return res.redirect("/student/payment-page");
+      return res.redirect("/student/course/" + courseId + "/payment");
     } else {
       enrollment.paymentStatus = "free"; // إذا كان الكورس مجاني، اجعل حالة الدفع مجانية
       enrollment.status = "active"; // اجعل حالة التسجيل نشطة
@@ -169,8 +171,8 @@ student_enroll_course_post = async (req, res) => {
 };
 student_myCourses_get = async (req, res) => {
   try {
-    const studentId = req.user._id; // الحصول على الـ id الخاص بالطالب من التوكن
-    const enrollments = await Enrollment.find({ student: studentId }) // جلب جميع التسجيلات الخاصة بالطالب
+    const student = await Student.findOne({ user: req.user._id }); // الحصول على الـ id الخاص بالطالب من التوكن
+    const enrollments = await Enrollment.find({ student: student._id }) // جلب جميع التسجيلات الخاصة بالطالب
       .populate({
         path: "course",
         populate: {
@@ -198,9 +200,9 @@ student_myCourses_get = async (req, res) => {
 student_myCourses_courseDetails_get = async (req, res) => {
   try {
     const courseId = req.params.id; // الحصول على الـ id من الرابط
-    const studentId = req.user._id; // الحصول على الـ id الخاص بالطالب من التوكن
+    const student = await Student.findOne({ user: req.user._id }); // الحصول على الـ id الخاص بالطالب من التوكن
     const enrollment = await Enrollment.findOne({
-      student: studentId,
+      student: student._id,
       course: courseId,
     }) // جلب التسجيل الخاص بالطالب في الكورس
       .populate("course") // جلب الكورس الخاص بالتسجيل
@@ -282,7 +284,7 @@ student_course_lesson_get = async (req, res) => {
   try {
     const courseId = req.params.id; // الحصول على الـ id من الرابط
     const lessonId = req.params.lessonId; // الحصول على الـ id من الرابط
-    const studentId = req.user._id; // الحصول على الـ id الخاص بالطالب من التوكن
+    const student = await Student.findOne({ user: req.user._id }); // الحصول على الـ id الخاص بالطالب من التوكن
     const course = await Course.findById(courseId).populate("lessons"); // جلب الدروس الخاصة بالكورس
     if (!course) {
       req.flash("error", "Course not found.");
@@ -301,14 +303,14 @@ student_course_lesson_get = async (req, res) => {
 
     // التحقق مما إذا كان الطالب مسجلاً في الكورس
     const enrollment = await Enrollment.findOne({
-      student: studentId,
+      student: student._id,
       course: courseId,
     }); // جلب التسجيل الخاص بالطالب في الكورس
 
     if (!enrollment) {
       console.log(
         "Enrollment not found for student:",
-        studentId,
+        student._id,
         "in course:",
         courseId
       );
@@ -371,9 +373,9 @@ student_course_lesson_get = async (req, res) => {
 student_course_payment_get = async (req, res) => {
   try {
     const courseId = req.params.id;
-    const studentId = req.user._id; // الحصول على الـ id الخاص بالطالب من التوكن
+    const student = await Student.findOne({ user: req.user._id }); // الحصول على الـ id الخاص بالطالب من التوكن
     const enrollment = await Enrollment.findOne({
-      student: studentId,
+      student: student._id,
       course: courseId,
     }).populate("course");
     if (!enrollment) {
@@ -394,9 +396,9 @@ student_course_payment_get = async (req, res) => {
 student_course_payment_post = async (req, res) => {
   try {
     const courseId = req.params.id;
-    const studentId = req.user._id; // الحصول على الـ id الخاص بالطالب من التوكن
+    const student = await Student.findOne({ user: req.user._id }); // الحصول على الـ id الخاص بالطالب من التوكن
     const enrollment = await Enrollment.findOne({
-      student: studentId,
+      student: student._id,
       course: courseId,
     }).populate("course");
     if (!enrollment) {
@@ -421,8 +423,8 @@ student_course_payment_post = async (req, res) => {
 };
 student_payments_get = async (req, res) => {
   try {
-    const studentId = req.user._id; // الحصول على الـ id الخاص بالطالب من التوكن
-    const enrollments = await Enrollment.find({ student: studentId }) // جلب جميع التسجيلات الخاصة بالطالب
+    const student = await Student.findOne({ user: req.user._id }); // الحصول على الـ id الخاص بالطالب من التوكن
+    const enrollments = await Enrollment.find({ student: student._id }) // جلب جميع التسجيلات الخاصة بالطالب
       .populate("course");
     res.render("pages/student/myPayments", { enrollments });
   } catch (err) {

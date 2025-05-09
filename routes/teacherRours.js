@@ -21,5 +21,6 @@ router.put("/teacher/courses/:id/lessons/edit/:id", requireAuth, isTeacher, teac
 //router.put("/teacher/courses/status/:id", requireAuth,  teacherController.teacher_course_status_put);
 router.delete("/teacher/courses/delete/:id" , requireAuth, isTeacher, teacherController.teacher_course_delete);
 router.put("/teacher/course/status/:id", requireAuth, isTeacher, teacherController.teacher_course_status_put);
+router.get("/teacher/studentEnrollments", requireAuth, isTeacher, teacherController.teacher_student_enrollments_get);
 
 module.exports = router;
