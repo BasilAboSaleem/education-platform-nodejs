@@ -52,41 +52,51 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <% enrollments.forEach((enrollment, index) => { %>
+                        <% data.forEach((item, index) => { %>
                           <tr>
                             <td><%= index + 1 %></td>
-                            <td><%= enrollment.enrolledAt.toLocaleDateString() %></td>
-                            <td><%= enrollment.course.title %></td>
-                            <td>$<%= enrollment.course.price %></td>
+                            <td>
+                              <%= item.payment 
+                                ? item.payment.paymentDate.toLocaleDateString() 
+                                : item.enrollment.createdAt.toLocaleDateString() %>
+                            </td>
+                            <td><%= item.enrollment.course.title %></td>
+                            <td>
+                              <% if (item.payment) { %>
+                                $<%= item.payment.amount %>
+                              <% } else if (item.enrollment.course.price === 0) { %>
+                                Free
+                              <% } else { %>
+                                $<%= item.enrollment.course.price %>
+                              <% } %>
+                            </td>
                             <td>
                               <% 
                                 let badgeClass = "";
-                                let statusLabel = enrollment.paymentStatus;
-                              
-                                if (enrollment.paymentStatus === "paid") {
+                                let statusLabel = "";
+                      
+                                if (item.payment && item.payment.paymentStatus === "paid") {
                                   badgeClass = "badge-success";
-                                  statusLabel = "Completed";
-                                } else if (enrollment.paymentStatus === "unpaid") {
-                                  badgeClass = "badge-danger";
-                                  statusLabel = "unpaid";
-                                } else if (enrollment.paymentStatus === "free") {
+                                  statusLabel = "Completed";  
+                                } else if (item.enrollment.course.price === 0) {
                                   badgeClass = "badge-info";
-                                  statusLabel = "free";
+                                  statusLabel = "Free";
+                                } else{
+                                  badgeClass = "badge-warning";
+                                  statusLabel = "Unpaid";
                                 }
                               %>
                               <label class="badge <%= badgeClass %>"><%= statusLabel %></label>
                             </td>
-                            <% if (enrollment.paymentStatus !== "paid") { %>
-                             
-                              <td colspan="5">_*_</td>
-                            <% } else {%>
-                         
-                              <td><%= enrollment.paymentMethod.charAt(0).toUpperCase() + enrollment.paymentMethod.slice(1) %></td>
-                            <% } %>
-
+                            <td>
+                              <%= item.payment 
+                                ? item.payment.paymentMethod.charAt(0).toUpperCase() + item.payment.paymentMethod.slice(1)
+                                : (item.enrollment.course.price === 0 ? "Free" : "N/A") %>
+                            </td>
                           </tr>
                         <% }) %>
                       </tbody>
+                      
                     </table>
                   </div>
                 </div>

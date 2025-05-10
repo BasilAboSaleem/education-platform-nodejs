@@ -5,7 +5,7 @@ const Course = require("../models/course");
 const Lesson = require("../models/lesson");
 const Category = require("../models/Category");
 const Enrollment = require("../models/enrollment");
-
+const Payment = require("../models/payment");
 const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
@@ -144,25 +144,27 @@ student_enroll_course_post = async (req, res) => {
     const enrollment = await Enrollment.create({
       student: student._id,
       course: courseId,
-    });
-    if (course.price > 0) {
-      enrollment.paymentStatus = "unpaid"; // إذا كان الكورس مدفوع، اجعل حالة الدفع غير مدفوعة
-      enrollment.status = "pending";
-      await enrollment.save(); // حفظ التسجيل في قاعدة البيانات
+      status: "pending", // حالة التسجيل مؤقتة حتى يتم الدفع
+    }); // جلب الكورس المرتبط بالتسجيل
+    if(course.price === 0){
+      enrollment.status = "active"; 
+      await enrollment.save();
+      req.flash("success", "You have successfully enrolled in the course.");
+      return res.redirect("/student/my-courses");
+    }
+
+    if(course.price > 0){
+      const payment = await Payment.create({
+        enrollment: enrollment._id,
+        paymentStatus: "unpaid",
+        amount: course.price,
+      }); 
+      await enrollment.save();
       req.flash(
         "success",
         "You have successfully enrolled in the course. Please proceed to payment."
       );
-      //تحويل الطالب لصفحة الدفع
-      return res.redirect("/student/course/" + courseId + "/payment");
-    } else {
-      enrollment.paymentStatus = "free"; // إذا كان الكورس مجاني، اجعل حالة الدفع مجانية
-      enrollment.status = "active"; // اجعل حالة التسجيل نشطة
-      await enrollment.save(); // حفظ التسجيل في قاعدة البيانات
-      req.flash("success", "You have successfully enrolled in the course.");
-
-      //تحويل الطالب لصفحة كورساتي
-      return res.redirect("/student/my-courses");
+      res.redirect("/student/course/" + courseId + "/payment");
     }
   } catch (err) {
     console.log(err);
@@ -308,28 +310,16 @@ student_course_lesson_get = async (req, res) => {
     }); // جلب التسجيل الخاص بالطالب في الكورس
 
     if (!enrollment) {
-      console.log(
-        "Enrollment not found for student:",
-        student._id,
-        "in course:",
-        courseId
-      );
       req.flash("error", "You are not enrolled in this course.");
       return res.redirect("/student/my-courses");
     }
 
-    if (course.price > 0 && enrollment.paymentStatus !== "paid") {
+    if (course.price > 0 && enrollment.status !== "active") {
       req.flash("error", "Payment required to access this course lesson.");
       return res.redirect("/student/my-courses/courseDetails/" + courseId);
     }
-
+ 
     if (enrollment.status !== "active") {
-      console.log(
-        "Enrollment status is not active for student:",
-        studentId,
-        "in course:",
-        courseId
-      );
       req.flash("error", "Your enrollment is pending approval or incomplete.");
       return res.redirect("/student/my-courses/courseDetails/" + courseId);
     }
@@ -382,7 +372,7 @@ student_course_payment_get = async (req, res) => {
       req.flash("error", "You are not enrolled in this course.");
       return res.redirect("/student/my-courses");
     }
-    if (enrollment.paymentStatus === "paid") {
+    if (enrollment.status === "active") {
       req.flash("success", "You have already paid for this course.");
       return res.redirect("/student/my-courses/courseDetails/" + courseId);
     }
@@ -404,14 +394,23 @@ student_course_payment_post = async (req, res) => {
     if (!enrollment) {
       req.flash("error", "You are not enrolled in this course.");
       return res.redirect("/student/my-courses");
-    }
-    if (enrollment.paymentStatus === "paid") {
+    } 
+    if (enrollment.status === "active") {
       req.flash("success", "You have already paid for this course.");
       return res.redirect("/student/my-courses/courseDetails/" + courseId);
+    } 
+    const payment = await Payment.findOne({
+      enrollment: enrollment._id,
+    }); // جلب الدفع الخاص بالتسجيل
+    if (payment.paymentStatus === "paid") {
+      req.flash("error", "Payment has already been made for this enrollment.");
+      return res.redirect("/student/my-courses/courseDetails/" + courseId);
     }
-    enrollment.paymentStatus = "paid"; // تحديث حالة الدفع إلى مدفوعة
+    payment.paymentStatus = "paid"; // تحديث حالة الدفع إلى مدفوعة
     enrollment.status = "active"; // تحديث حالة التسجيل إلى نشطة
-    enrollment.paymentMethod = req.body.paymentMethod; // حفظ طريقة الدفع
+    payment.paymentMethod = req.body.paymentMethod; // حفظ طريقة الدفع
+    payment.transactionId = req.body.transactionId || "TXN-" + Date.now(); // يمكنك توليد ID وهمي هنا
+    await payment.save();
     await enrollment.save(); // حفظ التغييرات في قاعدة البيانات
     req.flash("success", "Payment successful. You can now access the course.");
 
@@ -426,7 +425,14 @@ student_payments_get = async (req, res) => {
     const student = await Student.findOne({ user: req.user._id }); // الحصول على الـ id الخاص بالطالب من التوكن
     const enrollments = await Enrollment.find({ student: student._id }) // جلب جميع التسجيلات الخاصة بالطالب
       .populate("course");
-    res.render("pages/student/myPayments", { enrollments });
+    const payments = await Payment.find({ enrollment: { $in: enrollments.map(e => e._id) } }); // جلب جميع المدفوعات الخاصة بالتسجيلات
+    const data = enrollments.map(enrollment => {
+      const payment = payments.find(p => p.enrollment.toString() === enrollment._id.toString());
+      return { enrollment, payment };
+    });
+      
+
+    res.render("pages/student/myPayments", { data });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Internal server error" });

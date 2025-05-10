@@ -37,7 +37,7 @@
               <% } %>
                 <div class="card-body">
                   <div class="search-container" style="display: flex; justify-content: flex-end;">
-                    <form action="/teacher/studentEnrolment/search" method="post" style="display: inline;">
+                    <form action="/teacher/studentEnrollments" method="GET" style="display: inline;">
                       <input type="text" name="query" placeholder="Search for teachers" class="form-control" style="display: inline-block; width: auto;">
                       <button type="submit" class="btn btn-sm btn-primary">
                         <i class="mdi mdi-magnify"></i> Search
@@ -61,12 +61,30 @@
                         <% studentEnrollments.forEach((studentEnrollment , index) => { %>
                             <tr>
                                 <td><%= index + 1 %></td>
-                                <td><%= studentEnrollment.student && studentEnrollment.student.user ? studentEnrollment.student.user.name : 'N/A' %></td>
-                                <td><%= studentEnrollment.student && studentEnrollment.student.user ? studentEnrollment.student.user.email : 'N/A' %></td>
-                                <td><%= studentEnrollment.status %></td>
-                                <td><%= moment(studentEnrollment.createdAt).format('DD/MM/YYYY') %></td>
-                            </tr>
+                                <td><%= studentEnrollment.student.user.name %></td>
+                                <td><%= studentEnrollment.student.user.email %></td>
+                                
+                                <td>
+                                  <% 
+                                    let badgeClass = '';
+                                    let statusLabel = '';
                             
+                                    if (studentEnrollment.status === "active") {
+                                      badgeClass = 'badge-success';
+                                      statusLabel = 'Active';
+                                    
+                                    } else {
+                                      badgeClass = 'badge-warning';
+                                      statusLabel = 'pending';
+                                    }
+                                  %>
+                                  <label class="badge <%= badgeClass %>"><%= statusLabel %></label>
+                                </td>
+                                <td><%= moment(studentEnrollment.createdAt).format('DD/MM/YYYY') %></td>
+                                <td><a href="/teacher/studentEnrolment/<%= studentEnrollment._id %>" class="btn btn-sm btn-info">Details</a></td>
+
+                            </tr>
+
                         <% }) %>
                     
                         

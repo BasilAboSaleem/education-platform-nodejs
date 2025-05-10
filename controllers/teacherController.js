@@ -5,6 +5,7 @@ const Course = require("../models/course");
 const Lesson = require("../models/lesson");
 const Category = require("../models/Category");
 const Enrollment = require("../models/enrollment");
+const Payment = require("../models/payment");
 
 const { check, validationResult } = require("express-validator");
 const bcrypt = require('bcrypt');
@@ -17,6 +18,7 @@ require('dotenv').config();
 const fs = require('fs');
 const teacher = require("../models/teacher");
 const path = require("path");
+const enrollment = require("../models/enrollment");
  // Configuration cloudinary اعدادات الكلاودنري
  cloudinary.config({ 
     cloud_name: process.env.CLOUD_NAME, 
@@ -319,9 +321,11 @@ teacher_course_status_put = async (req, res) => {
 }
 teacher_student_enrollments_get = async (req, res) => {
     try {
+
       const teacher = await Teachers.findOne({user: req.user.id}) // المعلم الحالي 
+      const searchQuery = req.query.query?.toLowerCase() || ""; // استعلام البحث
   
-      const studentEnrollments = await Enrollment.find()
+      let studentEnrollments = await Enrollment.find()
         .populate({
           path: "course",
           match: { teacher: teacher._id }, // فلترة الكورسات التي تخص المعلم فقط يعني شرط
@@ -334,19 +338,50 @@ teacher_student_enrollments_get = async (req, res) => {
             select: "name email",
           },
         });
+         // فلترة حسب حقل البحث الموحد
+    if (searchQuery) {
+        studentEnrollments = studentEnrollments.filter((enroll) => {
+          const studentName = enroll.student.user.name?.toLowerCase() || "";
+          const courseTitle = enroll.course.title?.toLowerCase() || "";
+          const status = enroll.status?.toLowerCase() || "";
+          const createdAt = enroll.createdAt.toISOString().split("T")[0]; // YYYY-MM-DD
   
-      // فلترة النتائج لإزالة الاشتراكات التي لم تطابق الشرط (يعني course = null)
-      const filteredEnrollments = studentEnrollments.filter(e => e.course !== null);
+          return (
+            studentName.includes(searchQuery) ||
+            courseTitle.includes(searchQuery) ||
+            status.includes(searchQuery) ||
+            createdAt.includes(searchQuery)
+          );
+        });
+      }
+      
   
-      res.render("pages/teacher/studentEnrollments", {
-        studentEnrollments: filteredEnrollments,
-        moment: moment,
-      });
+      res.render("pages/teacher/studentEnrollments", { studentEnrollments, moment: moment });
     } catch (err) {
       console.log(err);
       res.status(500).send("Internal Server Error");
     }
   };
+  teacher_student_enrollment_view_get = async (req, res) => {
+    try{
+        const enrollment = await Enrollment.findById(req.params.id)
+        .populate({
+            path: "student",
+            populate: {
+              path: "user",
+              model: "User",
+              select: "name email"
+            }
+          })
+          .populate("course");
+        const payment = await Payment.findOne({enrollment: enrollment._id}).populate("enrollment");
+
+        res.render("pages/teacher/enrollmentDetails", { enrollment, payment , moment: moment });
+    }
+    catch(err){
+        console.log(err);
+    }
+  } 
   
 module.exports = {
     teacher_addCourse_get,
@@ -364,4 +399,6 @@ module.exports = {
     teacher_course_status_put,
     teacher_course_delete,
     teacher_student_enrollments_get,
+    
+    teacher_student_enrollment_view_get,
 };

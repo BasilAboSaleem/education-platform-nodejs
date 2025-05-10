@@ -18,6 +18,7 @@ A full-featured educational platform for displaying and selling courses. The sys
   - View and manage own courses and lessons
   - Add new courses and lessons
   - **Student Enrollment Page**: A new page for teachers to view and manage their students' enrollments.
+  - **Enrollment Details Page**: New page to show detailed enrollment information for students.
 
 - **Student Dashboard**:
   - View enrolled courses with details and progress
@@ -41,6 +42,8 @@ A full-featured educational platform for displaying and selling courses. The sys
   - Enhanced the admin dashboard for better management of courses and users
   - Fixed bugs related to course payment redirection
   - **New Page**: Added a "Student Enrollment" page in the teacher dashboard to manage student enrollments.
+  - **New Page**: Added an "Enrollment Details" page to manage student enrollment information for teachers.
+
 🔧 Remaining: enrollment features, visitor page backend, and additional enhancements
 
 ## 📁 Structure & Notes

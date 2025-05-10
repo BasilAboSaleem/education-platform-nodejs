@@ -17,16 +17,7 @@ const enrollmentSchema = new Schema({
       enum: ['pending', 'active', 'rejected', 'completed'],
       default: 'pending',
     },
-    paymentStatus: {
-      type: String,
-      enum: ['free', 'paid', 'unpaid'],
-      default: 'free',
-    },
-    paymentMethod: {
-      type: String,
-      enum: ["paypal", "visa", "stripe", "bank", "cash"],
-      default: "paypal"
-    },
+    
     enrolledAt: {
       type: Date,
       default: Date.now,

@@ -16,6 +16,7 @@ This file contains a list of planned improvements, features, and tasks to be imp
 
 ## 💳 Payment System
 
+- [ ]  Develop the payment system to become a separate and independent model.
 - [ ] Integrate real payment gateway (e.g., Stripe or PayPal)
 - [ ] Add a "payment history" page for students
 - [ ] Send invoice emails after successful payments
