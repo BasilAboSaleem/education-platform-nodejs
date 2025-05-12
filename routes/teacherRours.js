@@ -24,4 +24,5 @@ router.put("/teacher/course/status/:id", requireAuth, isTeacher, teacherControll
 router.get("/teacher/studentEnrollments", requireAuth, isTeacher, teacherController.teacher_student_enrollments_get);
 router.get("/teacher/studentEnrolment/:id", requireAuth, isTeacher, teacherController.teacher_student_enrollment_view_get);
 
+
 module.exports = router;

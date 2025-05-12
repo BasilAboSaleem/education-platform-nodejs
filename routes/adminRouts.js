@@ -56,4 +56,8 @@ router.put("/admin/pending-lessons/view/status/publish/:id", requireAuth, isAdmi
 router.put("/admin/pending-lessons/view/status/reject/:id", requireAuth, isAdmin, adminController.admin_pending_lessons_reject_put );
 router.get("/admin/courses/:id/lessons/view/:id", requireAuth, isAdmin, adminController.admin_courses_lessons_view_get );
 router.put("/admin/course-lessons/view/status/reject/:id", requireAuth, isAdmin, adminController.admin_course_lessons_reject_put );
-module.exports = router; 
+router.get("/admin/payments", requireAuth, isAdmin, adminController.admin_payments_get );
+router.get("/admin/payments/view/:id", requireAuth, isAdmin, adminController.admin_payments_view_get );
+router.get("/admin/payments/export", requireAuth, isAdmin, adminController.admin_payments_export_get );
+router.get("/admin/payments/view-course/:id", requireAuth, isAdmin, adminController.admin_payments_view_course_get );
+module.exports = router;

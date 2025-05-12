@@ -159,7 +159,7 @@ student_enroll_course_post = async (req, res) => {
         paymentStatus: "unpaid",
         amount: course.price,
       }); 
-      await enrollment.save();
+      
       req.flash(
         "success",
         "You have successfully enrolled in the course. Please proceed to payment."

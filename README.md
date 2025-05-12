@@ -14,6 +14,8 @@ A full-featured educational platform for displaying and selling courses. The sys
   - Manage courses (list, add, edit, delete, view details with lessons)
   - Approve/reject pending courses and lessons with rejection reasons
   - Manage categories (list, add, edit, delete, change status, search)
+  - **Payment Report Section**: Fully integrated section to view, filter, and analyze all course payments, with internal tabs and branches for detailed reports.
+
 - **Teacher Dashboard**:
   - View and manage own courses and lessons
   - Add new courses and lessons
@@ -35,14 +37,15 @@ A full-featured educational platform for displaying and selling courses. The sys
 
 ## 📌 Project Status
 
-✅ About 80% of the core features are complete  
-🔧 **Recent Updates**: 
+✅ About 85% of the core features are complete  
+🔧 **Recent Updates**:
   - Fixed issues with course enrollment and payment processing
   - Improved user flow for student course enrollment (both free and paid courses)
   - Enhanced the admin dashboard for better management of courses and users
   - Fixed bugs related to course payment redirection
-  - **New Page**: Added a "Student Enrollment" page in the teacher dashboard to manage student enrollments.
-  - **New Page**: Added an "Enrollment Details" page to manage student enrollment information for teachers.
+  - **New Page**: Added a "Student Enrollment" page in the teacher dashboard to manage student enrollments
+  - **New Page**: Added an "Enrollment Details" page to manage student enrollment information for teachers
+  - **New Section**: Implemented the complete **Payment Report** section in the admin dashboard, with all subpages and detailed tabs
 
 🔧 Remaining: enrollment features, visitor page backend, and additional enhancements
 

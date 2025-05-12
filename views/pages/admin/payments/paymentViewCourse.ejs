@@ -50,75 +50,46 @@
                       <thead class="thead-light">
                         <tr>
                           <th>#</th>
-                          <th>Full Name</th>
+                          <th>Student Name</th>
                           <th>Email</th>
-                          <th>Phone</th>
-                          <th>Status</th>
-                          <th>Registered At</th>
-                          <th>Actions</th>
+                          <th>Amount</th>
+                          <th>Payment Status</th>
+                          <th>Date</th>
+                         
                         </tr>
                       </thead>
                       <tbody>
-                        <% teachers.forEach((teacher , index) => { %>
+                        <% filteredPayments.forEach((payment, index) => { %>
                           <tr>
                             <td><%= index + 1 %></td>
-                            <td><%= teacher.user.name %></td>
-                            <td><%= teacher.user.email %></td>
-                            <td><%= teacher.phone %></td>
+                            <td><%= payment.enrollment.student.user.name %></td>
+                            <td><%= payment.enrollment.student.user.email %></td>
+                            <td><%= payment.amount %></td>
                             <td>
                               <% 
                                 let badgeClass = "badge-secondary"; // الافتراضي (Pending)
-                                if (teacher.status === "Active") {
+                                if (payment.paymentStatus === "paid") {
                                   badgeClass = "badge-success"; // اللون الأخضر (Active)
-                                } else if (teacher.status === "Inactive") {
+                                } else if (payment.paymentStatus === "unpaid") {
                                   badgeClass = "badge-danger"; // اللون الأحمر (Inactive)
                                 }
                               %>
-                              <label class="badge <%= badgeClass %>"><%= teacher.status %></label>
-                            </td> 
-                             <td><%= moment(teacher.createdAt).format('DD/MM/YYYY')%></td>
-                            <td>
-                              <a href="/admin/teachers/view/<%= teacher._id %>" class="btn btn-sm btn-info btn-icon-text">
-                                  <i class="mdi mdi-eye btn-icon-prepend"></i> View
-                                </a>
-                              <a href="/admin/teachers/edit/<%= teacher._id %>" class="btn btn-sm btn-primary btn-icon-text">
-                                <i class="mdi mdi-pencil btn-icon-prepend"></i> Edit
-                              </a>
-                              <form action="/admin/teachers/delete/<%= teacher._id %>?_method=DELETE" method="POST" style="display: inline;">
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this teacher?');">
-                                  <i class="mdi mdi-delete"></i> Delete
-                                </button>
-                              </form>
-                              <form action="/admin/teachers/status/<%= teacher._id %>?_method=PUT" method="POST" style="display: inline;">
-                                <% 
-                                  let btnClass = "badge-secondary"; // الافتراضي
-                                  let icon = "mdi mdi-clock"; // الأيقونة الافتراضية (Pending)
-                                  if (teacher.status === "Active") {
-                                    btnClass = "badge-success"; // اللون الأخضر (Active)
-                                    icon = "mdi mdi-check-circle"; // أيقونة نشطة
-                                  } else if (teacher.status === "Inactive") {
-                                    btnClass = "btn-danger";
-                                    icon = "mdi mdi-close-circle"; // أيقونة غير نشطة
-                                  }
-                                %>
-                                <button type="submit" class="btn btn-sm <%= btnClass %> btn-icon-text">
-                                  <i class="<%= icon %> btn-icon-prepend"></i>
-                                  <% if (teacher.status === "Pending") { %> Pending <% } 
-                                     else if (teacher.status === "Active") { %> Active <% } 
-                                     else { %> Inactive <% } %>
-                                </button>
-                              </form>
-                              
-                           
+                              <label class="badge <%= badgeClass %>"><%= payment.paymentStatus %></label>
                             </td>
-                            
+                            <td><%= moment(payment.createdAt).format('DD/MM/YYYY')%></td>
+                         
+                              
                           </tr>
+                          
                         <% }) %>
                     
                         
                         <!-- Add more rows as needed -->
                       </tbody>
                     </table>
+                      <a href="/admin/payments" class="btn btn-sm btn-secondary mt-3">
+                      <i class="mdi mdi-arrow-left"></i> Back to List
+                    </a>
                   </div>
                 </div>
               </div>
