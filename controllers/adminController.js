@@ -5,6 +5,7 @@ const Category = require("../models/Category");
 const Course = require("../models/course");
 const Lesson = require("../models/lesson");
 const Payment = require("../models/payment");
+const Enrollment = require("../models/enrollment");
 const { check, validationResult } = require("express-validator");
 const bcrypt = require('bcrypt');
 var jwt = require("jsonwebtoken");
@@ -911,7 +912,8 @@ const paymentByCourse = await Payment.aggregate([
 const unpaidPayments = payments.filter(payment => payment.paymentStatus === 'unpaid');
 const paidPayments = payments.filter(payment => payment.paymentStatus === 'paid');
 
-      res.render("pages/admin/payments/paymentReporte", { payments, totalPayment, pendingPayment, successfullyPayment, paymentByCourse, unpaidPayments, paidPayments, moment });
+res.render("pages/admin/payments/paymentReporte",
+   { payments, totalPayment, pendingPayment, successfullyPayment, paymentByCourse, unpaidPayments, paidPayments, moment });
 
     }
     catch(err){
@@ -1039,8 +1041,169 @@ const paidPayments = payments.filter(payment => payment.paymentStatus === 'paid'
     }
   }
   
-module.exports= {
- 
+admin_payments_paymentsByCourse_export_get = async (req, res) => {
+  try {
+    // 1. جميع المدفوعات مع التفاصيل
+    const payments = await Payment.find().populate({
+      path: 'enrollment',
+      populate: [
+        {
+          path: 'student',
+          populate: {
+            path: 'user',
+            select: 'name email'
+          }
+        },
+        {
+          path: 'course',
+          model: 'Course'
+        }
+      ]
+    });
+
+    // 2. نحسب عدد الطلاب لكل كورس (بدون تكرار)
+    const enrollments = await Enrollment.find();
+    const studentCountMap = {};
+
+    enrollments.forEach(enroll => {
+      const courseId = enroll.course.toString();
+      const studentId = enroll.student.toString();
+
+      if (!studentCountMap[courseId]) {
+        studentCountMap[courseId] = new Set();
+      }
+      studentCountMap[courseId].add(studentId);
+    });
+
+    // 3. تجهيز البيانات لـ CSV
+    const csvData = payments.map(payment => {
+      const course = payment.enrollment?.course;
+      const courseId = course?._id?.toString();
+      const numberOfStudents = studentCountMap[courseId]?.size || 0;
+
+      return {
+        courseTitle: course?.title || 'Unknown',
+        numberOfStudents,
+        totalAmount: payment.amount,
+        successfulPayments: payment.paymentStatus === 'paid' ? payment.amount : 0,
+        pendingPayments: payment.paymentStatus === 'unpaid' ? payment.amount : 0,
+      };
+    });
+
+    // 4. توليد CSV
+    const json2csv = new Parser();
+    const csv = json2csv.parse(csvData);
+
+    // 5. إرسال الملف كـ CSV
+    res.header('Content-Type', 'text/csv');
+    res.attachment('payments.csv');
+    return res.send(csv);
+
+  } catch (err) {
+    console.error('Export CSV Error:', err);
+    res.status(500).send('Error generating CSV');
+  }
+};
+
+
+admin_payments_pendingPayments_export_get = async (req, res) => {
+  try{
+    // 1. جميع المدفوعات مع التفاصيل
+ const payments = await Payment.find({ paymentStatus: 'unpaid' }).populate({
+  path: 'enrollment',
+  populate: [
+    {
+      path: 'student',
+      populate: {
+        path: 'user',
+        select: 'name email',
+        model: 'User'
+      }
+    },
+    {
+      path: 'course',
+      model: 'Course'
+    }
+  ]
+});
+
+    // 2. تجهيز البيانات لـ CSV
+    const csvData = payments.map(payment => {
+      const course = payment.enrollment?.course;
+      return {
+        transactionId: payment._id,
+        studentName: payment.enrollment.student.user.name,
+        studentEmail: payment.enrollment.student.user.email,
+        courseTitle: course?.title || 'Unknown',
+        amount: payment.amount,
+        status: payment.paymentStatus,
+        date: payment.createdAt.toLocaleDateString(),
+      };
+    });
+    // 3. توليد CSV
+    const json2csv = new Parser();
+    const csv = json2csv.parse(csvData);
+
+      // 5. إرسال الملف كـ CSV
+    res.header('Content-Type', 'text/csv');
+    res.attachment('payments.csv');
+    return res.send(csv);
+
+
+
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).send('Error generating CSV');
+  }
+}
+admin_payments_successfulPayments_export_get = async (req, res) => {
+  try{
+    const payments = await Payment.find({ paymentStatus: 'paid' }).populate({
+  path: 'enrollment',
+  populate: [
+    {
+      path: 'student',
+      populate: {
+        path: 'user',
+        select: 'name email',
+        model: 'User'
+      }
+    },
+    {
+      path: 'course',
+      model: 'Course'
+    }
+  ]
+});
+    const csvData = payments.map(payment => {
+      const course = payment.enrollment?.course;
+      return {
+        transactionId: payment._id,
+        studentName: payment.enrollment.student.user.name,
+        studentEmail: payment.enrollment.student.user.email,
+        courseTitle: course?.title || 'Unknown',
+        amount: payment.amount,
+        status: payment.paymentStatus,
+        paymentMethod: payment.paymentMethod,
+        date: payment.createdAt.toLocaleDateString(),
+      };
+    });
+    const json2csv = new Parser();
+    const csv = json2csv.parse(csvData);
+
+    res.header('Content-Type', 'text/csv');
+    res.attachment('payments.csv');
+    return res.send(csv);
+
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).send('Error generating CSV');
+  }
+}
+module.exports = {
+
     admin_students_get,
     admin_students_view_get,
     admin_students_edit_get,
@@ -1088,4 +1251,7 @@ module.exports= {
     admin_payments_view_get,
     admin_payments_export_get,
     admin_payments_view_course_get,
+    admin_payments_paymentsByCourse_export_get,
+    admin_payments_pendingPayments_export_get,
+    admin_payments_successfulPayments_export_get,
    }

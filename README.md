@@ -15,6 +15,10 @@ A full-featured educational platform for displaying and selling courses. The sys
   - Approve/reject pending courses and lessons with rejection reasons
   - Manage categories (list, add, edit, delete, change status, search)
   - **Payment Report Section**: Fully integrated section to view, filter, and analyze all course payments, with internal tabs and branches for detailed reports.
+    - All Payments
+    - Payments by Course
+    - Pending Payments
+    - Successful Payments
 
 - **Teacher Dashboard**:
   - View and manage own courses and lessons
@@ -48,6 +52,10 @@ A full-featured educational platform for displaying and selling courses. The sys
   - **New Section**: Implemented the complete **Payment Report** section in the admin dashboard, with all subpages and detailed tabs
 
 🔧 Remaining: enrollment features, visitor page backend, and additional enhancements
+
+## 🧩 Planned Features
+
+- Platform Earnings Dashboard: A future section to analyze the platform's net revenue by calculating commissions from each transaction.
 
 ## 📁 Structure & Notes
 

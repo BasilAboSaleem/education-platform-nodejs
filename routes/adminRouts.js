@@ -60,4 +60,7 @@ router.get("/admin/payments", requireAuth, isAdmin, adminController.admin_paymen
 router.get("/admin/payments/view/:id", requireAuth, isAdmin, adminController.admin_payments_view_get );
 router.get("/admin/payments/export", requireAuth, isAdmin, adminController.admin_payments_export_get );
 router.get("/admin/payments/view-course/:id", requireAuth, isAdmin, adminController.admin_payments_view_course_get );
+router.get("/admin/payments/paymentsByCourse/export", requireAuth, isAdmin, adminController.admin_payments_paymentsByCourse_export_get );
+router.get("/admin/payments/pendingPayments/export", requireAuth, isAdmin, adminController.admin_payments_pendingPayments_export_get );
+router.get("/admin/payments/successfulPayments/export", requireAuth, isAdmin, adminController.admin_payments_successfulPayments_export_get );
 module.exports = router;

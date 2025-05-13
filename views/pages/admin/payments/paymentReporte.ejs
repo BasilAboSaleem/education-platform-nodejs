@@ -37,7 +37,7 @@
 
                 <!-- Search Form -->
                 <div class="d-flex justify-content-end mb-3">
-                  <form action="/admin/teachers/search" method="POST" class="d-flex">
+                  <form class="d-flex">
                     <input type="text" name="query" placeholder="Search for teachers" class="form-control form-control-sm me-2" />
                     <button type="submit" class="btn btn-sm btn-outline-primary">
                       <i class="mdi mdi-magnify"></i> Search
@@ -185,7 +185,7 @@
                           </tbody>
                         </table>
                      <div class="mt-4">
-                        <a href="/admin/payments/export" class="btn btn-success">Export to CSV</a>
+                        <a href="/admin/payments/paymentsByCourse/export" class="btn btn-success">Export to CSV</a>
                       </div>
                     </div>
                  
@@ -217,9 +217,9 @@
                             <tr>
                               <th>Transaction ID</th>
                               <th>Student Name</th>
+                              <th>Student Email</th>
                               <th>Course Title</th>
                               <th>Amount</th>
-                              <th>Payment Method</th>
                               <th>Status</th>
                               <th>Date</th>
                             </tr>
@@ -229,9 +229,9 @@
                             <tr>
                               <td><%= payment.transactionId %></td>
                               <td><%= payment.enrollment.student.user.name %></td>
+                              <td><%= payment.enrollment.student.user.email %></td>
                               <td><%= payment.enrollment.course.title %></td>
                               <td>$<%= payment.amount %></td>
-                              <td><%= payment.paymentMethod %></td>
                               <td><label class="badge badge-warning"><%= payment.paymentStatus %></label></td>
                               <td><%= moment(payment.paymentDate).format('DD/MM/YYYY') %></td>
                                 <td>
@@ -241,6 +241,9 @@
                             <% }) %>
                           </tbody>
                         </table>
+                          <div class="mt-4">
+                        <a href="/admin/payments/pendingPayments/export" class="btn btn-success">Export to CSV</a>
+                      </div>
                     </div>
                   </div>
 
@@ -292,6 +295,9 @@
                             <% }) %>
                           </tbody>
                         </table>
+                          <div class="mt-4">
+                        <a href="/admin/payments/successfulPayments/export" class="btn btn-success">Export to CSV</a>
+                      </div>
                     </div>
                   </div>
                 </div>
