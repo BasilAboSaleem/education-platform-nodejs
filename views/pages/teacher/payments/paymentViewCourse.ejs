@@ -15,11 +15,11 @@
   <body class="with-welcome-text">
     <div class="container-scroller">
       <!-- partials/starAdminpartials/_navbar.ejs -->
-     <%- include('../../partials/starAdminpartials/_navbar.ejs') %>
+     <%- include('../../../partials/starAdminpartials/_navbar.ejs') %>
       <!-- partial -->
       <div class="container-fluid page-body-wrapper">
         <!-- partials/starAdminpartials/_sidebar.ejs -->
-        <%- include('../../partials/starAdminpartials/_sidebar.ejs') %>
+        <%- include('../../../partials/starAdminpartials/_sidebar.ejs') %>
         <!-- Content -->
         <div class="main-panel">
             <div class="content-wrapper">
@@ -37,63 +37,59 @@
               <% } %>
                 <div class="card-body">
                   <div class="search-container" style="display: flex; justify-content: flex-end;">
-                    <form action="/teacher/studentEnrollments" method="GET" style="display: inline;">
+                    <form  method="get" style="display: inline;">
                       <input type="text" name="query" placeholder="Search for teachers" class="form-control" style="display: inline-block; width: auto;">
                       <button type="submit" class="btn btn-sm btn-primary">
                         <i class="mdi mdi-magnify"></i> Search
                       </button>
                     </form>
                   </div>
-                  <h4 class="card-title">Student List</h4>
+                  <h4 class="card-title"><%= course.title %> Course Payments</h4>
                   <div class="table-responsive">
                     <table class="table table-hover">
                       <thead class="thead-light">
                         <tr>
                           <th>#</th>
-                          <th>Name</th>
+                          <th>Student Name</th>
                           <th>Email</th>
-                          <th>Enrollment Status</th>
-                          <th>Enrollment Date</th>
-                          <th>Actions</th>
+                          <th>Amount</th>
+                          <th>Payment Status</th>
+                          <th>Date</th>
+                         
                         </tr>
                       </thead>
                       <tbody>
-                        <% studentEnrollments.forEach((studentEnrollment , index) => { %>
-                            <tr>
-                                <td><%= index + 1 %></td>
-                                <td><%= studentEnrollment.student.user.name %></td>
-                                <td><%= studentEnrollment.student.user.email %></td>
-                                
-                                <td>
-                                  <% 
-                                    let badgeClass = '';
-                                    let statusLabel = '';
-                            
-                                    if (studentEnrollment.status === "active") {
-                                      badgeClass = 'badge-success';
-                                      statusLabel = 'Active';
-                                    
-                                    } else {
-                                      badgeClass = 'badge-warning';
-                                      statusLabel = 'pending';
-                                    }
-                                  %>
-                                  <label class="badge <%= badgeClass %>"><%= statusLabel %></label>
-                                </td>
-                                <td><%= moment(studentEnrollment.createdAt).format('DD/MM/YYYY') %></td>
-                                <td><a href="/teacher/studentEnrolment/<%= studentEnrollment._id %>" class="btn btn-sm btn-info">Details</a></td>
-
-                            </tr>
-
+                        <% filteredPayments.forEach((payment, index) => { %>
+                          <tr>
+                            <td><%= index + 1 %></td>
+                            <td><%= payment.enrollment.student.user.name %></td>
+                            <td><%= payment.enrollment.student.user.email %></td>
+                            <td><%= payment.amount %></td>
+                            <td>
+                              <% 
+                                let badgeClass = "badge-secondary"; // الافتراضي (Pending)
+                                if (payment.paymentStatus === "paid") {
+                                  badgeClass = "badge-success"; // اللون الأخضر (Active)
+                                } else if (payment.paymentStatus === "unpaid") {
+                                  badgeClass = "badge-danger"; // اللون الأحمر (Inactive)
+                                }
+                              %>
+                              <label class="badge <%= badgeClass %>"><%= payment.paymentStatus %></label>
+                            </td>
+                            <td><%= moment(payment.createdAt).format('DD/MM/YYYY')%></td>
+                         
+                              
+                          </tr>
+                          
                         <% }) %>
                     
                         
                         <!-- Add more rows as needed -->
                       </tbody>
                     </table>
-                      <div class="mt-4">
-                        <a href="/teacher/enrollments/export" class="btn btn-success">Export to CSV</a>
-                      </div>
+                      <a href="/teacher/payments" class="btn btn-sm btn-secondary mt-3">
+                      <i class="mdi mdi-arrow-left"></i> Back to List
+                    </a>
                   </div>
                 </div>
               </div>

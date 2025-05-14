@@ -23,6 +23,11 @@ router.delete("/teacher/courses/delete/:id" , requireAuth, isTeacher, teacherCon
 router.put("/teacher/course/status/:id", requireAuth, isTeacher, teacherController.teacher_course_status_put);
 router.get("/teacher/studentEnrollments", requireAuth, isTeacher, teacherController.teacher_student_enrollments_get);
 router.get("/teacher/studentEnrolment/:id", requireAuth, isTeacher, teacherController.teacher_student_enrollment_view_get);
-
-
+router.get("/teacher/payments", requireAuth, isTeacher, teacherController.teacher_payments_get);
+router.get("/teacher/payments/view/:id", requireAuth, isTeacher, teacherController.teacher_payment_view_get);
+router.get("/teacher/payments/view-course/:id", requireAuth, isTeacher, teacherController.teacher_payment_view_course_get);
+router.get("/teacher/payments/export", requireAuth, isTeacher, teacherController.teacher_payments_export_get);
+router.get("/teacher/payments/paymentsByCourse/export", requireAuth, isTeacher, teacherController.teacher_payments_by_course_export_get);
+router.get("/teacher/payments/pendingPayments/export", requireAuth, isTeacher, teacherController.teacher_pending_payments_export_get);
+router.get("/teacher/payments/successfulPayments/export", requireAuth, isTeacher, teacherController.teacher_paid_payments_export_get);
 module.exports = router;

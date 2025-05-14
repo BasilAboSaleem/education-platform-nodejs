@@ -1096,7 +1096,7 @@ admin_payments_paymentsByCourse_export_get = async (req, res) => {
 
     // 5. إرسال الملف كـ CSV
     res.header('Content-Type', 'text/csv');
-    res.attachment('payments.csv');
+    res.attachment('paymentsByCourse.csv');
     return res.send(csv);
 
   } catch (err) {
@@ -1146,7 +1146,7 @@ admin_payments_pendingPayments_export_get = async (req, res) => {
 
       // 5. إرسال الملف كـ CSV
     res.header('Content-Type', 'text/csv');
-    res.attachment('payments.csv');
+    res.attachment('pendingPayments.csv');
     return res.send(csv);
 
 
@@ -1193,7 +1193,7 @@ admin_payments_successfulPayments_export_get = async (req, res) => {
     const csv = json2csv.parse(csvData);
 
     res.header('Content-Type', 'text/csv');
-    res.attachment('payments.csv');
+    res.attachment('successfulPayments.csv');
     return res.send(csv);
 
   }

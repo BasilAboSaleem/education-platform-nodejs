@@ -23,6 +23,11 @@ A full-featured educational platform for displaying and selling courses. The sys
 - **Teacher Dashboard**:
   - View and manage own courses and lessons
   - Add new courses and lessons
+  - **Payment Report Section**: Fully integrated section to view, filter, and analyze all course payments, with internal tabs and branches for detailed reports.
+    - All Payments
+    - Payments by Course
+    - Pending Payments
+    - Successful Payments
   - **Student Enrollment Page**: A new page for teachers to view and manage their students' enrollments.
   - **Enrollment Details Page**: New page to show detailed enrollment information for students.
 
