@@ -1,35 +1,54 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
-// تعريف الـ Schema للإشعارات
 const notificationSchema = new Schema({
   title: {
     type: String,
-    required: true
+    default: null
   },
   message: {
     type: String,
     required: true
   },
-  user: {
+
+  // لمستخدم معيّن
+  recipient: {
     type: Schema.Types.ObjectId,
-    ref: 'User', // تشير إلى موديل الـ User
-    required: true
+    ref: 'User',
+    default: null
   },
-  role: {
+
+  // لإشعار عام لمجموعة (طلاب، معلمين، أو الجميع)
+  targetRole: {
     type: String,
-    enum: ['student', 'teacher', 'admin'], // حقل يحدد دور المستخدم
-    required: true
+    enum: ['student', 'teacher', 'all'],
+    default: null
   },
+
+  // للكورسات
+  course: {
+    type: Schema.Types.ObjectId,
+    ref: 'Course',
+    default: null
+  },
+
+  // رابط اختياري
+  link: {
+    type: String,
+    default: null
+  },
+
+  // تم قراءته؟
   isRead: {
     type: Boolean,
-    default: false // حقل يحدد ما إذا كانت الإشعار مقروءة أم لا
+    default: false
   },
+
   createdAt: {
     type: Date,
-    default: Date.now 
+    default: Date.now
   }
 });
 
-// إنشاء الموديل بناءً على الـ Schema
+notificationSchema.index({ user: 1, createdAt: -1 });
+
 module.exports = mongoose.models.Notification || mongoose.model('Notification', notificationSchema);

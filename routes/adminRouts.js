@@ -63,4 +63,7 @@ router.get("/admin/payments/view-course/:id", requireAuth, isAdmin, adminControl
 router.get("/admin/payments/paymentsByCourse/export", requireAuth, isAdmin, adminController.admin_payments_paymentsByCourse_export_get );
 router.get("/admin/payments/pendingPayments/export", requireAuth, isAdmin, adminController.admin_payments_pendingPayments_export_get );
 router.get("/admin/payments/successfulPayments/export", requireAuth, isAdmin, adminController.admin_payments_successfulPayments_export_get );
+router.get("/admin/send-notification", requireAuth, isAdmin, adminController.admin_send_notification_get );
+router.post("/admin/send-notification", requireAuth, isAdmin, adminController.admin_send_notification_post );
+router.get("/admin/notifications", requireAuth, isAdmin, adminController.admin_notifications_get );
 module.exports = router;

@@ -6,6 +6,7 @@ const Course = require("../models/course");
 const Lesson = require("../models/lesson");
 const Payment = require("../models/payment");
 const Enrollment = require("../models/enrollment");
+const Notification = require("../models/notification");
 const { check, validationResult } = require("express-validator");
 const bcrypt = require('bcrypt');
 var jwt = require("jsonwebtoken");
@@ -1202,7 +1203,130 @@ admin_payments_successfulPayments_export_get = async (req, res) => {
     res.status(500).send('Error generating CSV');
   }
 }
+/// notifications ///
+admin_send_notification_get = async (req,res) => {
+  try{
+    const students = await User.find({ role: 'Student' }).select('name email');
+    const teachers = await User.find({ role: 'Teacher' }).select('name email');
+    const courses = await Course.find();
+    res.render("pages/admin/notifications/send-notification", {students, teachers, courses, moment});
+
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).send('Error sending notification');
+  }
+
+}
+
+admin_send_notification_post = async (req, res) => {
+  try {
+    const { targetRole, recipient, course, message, title, link } = req.body;
+
+    if (targetRole === 'all_students') {
+      const students = await User.find({ role: 'Student' });
+      for (let student of students) {
+        await Notification.create({
+          targetRole: 'student',
+          recipient: student._id,
+          message,
+          title,
+          link
+        });
+      }
+       req.flash('success', 'Notifications sent successfully');
+
+    } else if (targetRole === 'all_teachers') {
+      const teachers = await User.find({ role: 'Teacher' });
+      for (let teacher of teachers) {
+        await Notification.create({
+          targetRole: 'teacher',
+          recipient: teacher._id,
+          message,
+          title,
+          link
+        });
+      }
+       req.flash('success', 'Notifications sent successfully');
+
+    } else if (targetRole === 'course_students' && course) {
+      const enrollments = await Enrollment.find({ course }).populate("student");
+      if (!enrollments.length) {
+        return res.status(404).send("No students enrolled in this course.");
+      }
+      for (let enrollment of enrollments) {
+        await Notification.create({
+          targetRole: 'student',
+          recipient: enrollment.student._id,
+          message,
+          title,
+          link
+        });
+      }
+       req.flash('success', 'Notifications sent successfully');
+
+    } else if (
+      (targetRole === 'specific_student' || targetRole === 'specific_teacher') &&
+      recipient
+    ) {
+      const user = await User.findById(recipient);
+      if (!user) {
+        return res.status(404).send('User not found');
+      }
+
+    const expectedRole = targetRole.split('_')[1].toLowerCase(); // 'student' or 'teacher'
+if (user.role.toLowerCase() !== expectedRole) {
+  return res.status(400).send('Recipient role mismatch');
+}
+
+      await Notification.create({
+        targetRole:  expectedRole, // ✅ يجب أن تكون 'student' أو 'teacher',
+        recipient: user._id,
+        message,
+        title,
+        link
+      });
+
+       req.flash('success', 'Notification sent successfully');
+    } else {
+          req.flash('error', 'Invalid notification target or missing data');
+
+    }
+
+    res.redirect("/admin/send-notification");
+
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error sending notification');
+  }
+}
+
+admin_notifications_get = async (req, res) => {
+  try{
+    const notifications = await Notification.find().populate({
+      path: 'recipient',
+      select: 'name role',
+      model: 'User'
+    })
+    .populate({
+      path: 'course',
+      select: 'title',
+      model: 'Course'
+    });
+    res.render("pages/admin/notifications/all-notifications", { notifications, moment });
+
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).send('Error viewing notifications');
+  }
+}
+
+
+
 module.exports = {
+
 
     admin_students_get,
     admin_students_view_get,
@@ -1254,4 +1378,7 @@ module.exports = {
     admin_payments_paymentsByCourse_export_get,
     admin_payments_pendingPayments_export_get,
     admin_payments_successfulPayments_export_get,
+    admin_send_notification_get,
+    admin_send_notification_post,
+    admin_notifications_get,
    }
