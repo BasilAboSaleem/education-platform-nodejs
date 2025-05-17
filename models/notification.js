@@ -9,8 +9,7 @@ const notificationSchema = new Schema({
     type: String,
     required: true
   },
-
-  // لمستخدم معيّن
+  // لإشعار موجه لمستخدم معين المستقبل
   recipient: {
     type: Schema.Types.ObjectId,
     ref: 'User',

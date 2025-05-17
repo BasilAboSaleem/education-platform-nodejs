@@ -18,5 +18,6 @@ router.get("/student/course/:id/payment", requireAuth, isStudent, studentControl
 router.post("/student/course/:id/payment", requireAuth, isStudent, studentController.student_course_payment_post);
 router.get("/student/payments", requireAuth, isStudent, studentController.student_payments_get);
 //router.get("/student/all-courses/course/:id/enroll", requireAuth, isStudent, studentController.student_enroll_course_post);
+router.get("/student/notifications", requireAuth, isStudent, studentController.student_notifications_get);
 
 module.exports = router;

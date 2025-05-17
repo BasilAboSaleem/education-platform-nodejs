@@ -57,6 +57,11 @@ A full-featured educational platform for displaying and selling courses. The sys
   - View enrolled courses with details and progress
   - Browse and search all courses on the platform
   - Payment system with history view
+  - **Notification System**:
+    - A dedicated page to view all received notifications.
+    - Automatic notifications are triggered in the following scenarios:
+      - When the student enrolls in any course → the **teacher** of that course receives a notification.
+      - When the student completes a payment → the **admin** receives a notification.
 
 ## 🛠️ Tech Stack
 
@@ -77,7 +82,7 @@ A full-featured educational platform for displaying and selling courses. The sys
   - **New Page**: Added a "Student Enrollment" page in the teacher dashboard to manage student enrollments
   - **New Page**: Added an "Enrollment Details" page to manage student enrollment information for teachers
   - **New Section**: Implemented the complete **Payment Report** section in the admin dashboard, with all subpages and detailed tabs
-  - **New Feature**: Added a complete **Notification System** for both admin and teacher dashboards, with support for automatic and manual notifications based on actions across the platform.
+  - **New Feature**: Added a complete **Notification System** for admin, teacher, and student dashboards, with support for automatic and manual notifications based on actions across the platform.
 
 🔧 Remaining: enrollment features, visitor page backend, and additional enhancements
 

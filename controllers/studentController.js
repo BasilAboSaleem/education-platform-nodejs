@@ -6,6 +6,8 @@ const Lesson = require("../models/lesson");
 const Category = require("../models/Category");
 const Enrollment = require("../models/enrollment");
 const Payment = require("../models/payment");
+const Notefication = require("../models/notification");
+
 const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
@@ -149,6 +151,18 @@ student_enroll_course_post = async (req, res) => {
     if(course.price === 0){
       enrollment.status = "active"; 
       await enrollment.save();
+      //ارسال اشعار للمدرس
+      const teacher = await Teachers.findById(course.teacher._id).populate({
+        path: "user",
+        select: "name",
+      });
+      const notification = await Notefication.create({
+        recipient: teacher.user._id,
+        sender: req.user._id,
+        targetRole: "teacher",
+        message: `New enrollment in your course: ${course.title}`,
+        course: course._id,
+      });
       req.flash("success", "You have successfully enrolled in the course.");
       return res.redirect("/student/my-courses");
     }
@@ -159,7 +173,6 @@ student_enroll_course_post = async (req, res) => {
         paymentStatus: "unpaid",
         amount: course.price,
       }); 
-      
       req.flash(
         "success",
         "You have successfully enrolled in the course. Please proceed to payment."
@@ -412,6 +425,27 @@ student_course_payment_post = async (req, res) => {
     payment.transactionId = req.body.transactionId || "TXN-" + Date.now(); // يمكنك توليد ID وهمي هنا
     await payment.save();
     await enrollment.save(); // حفظ التغييرات في قاعدة البيانات
+    // إرسال إشعار للمدرس
+    const teacher = await Teachers.findById(enrollment.course.teacher._id).populate({
+      path: "user",
+      select: "name",
+    });
+    const notification = await Notefication.create({
+      recipient: teacher.user._id,
+      sender: req.user._id,
+      targetRole: "teacher",
+      message: `New enrollment in your paid course: ${enrollment.course.title}`,
+      course: enrollment.course._id,
+    });
+    //ارشال اشعار للأدمن
+    const admin = await User.findOne({ role: "Admin" });
+    const adminNotification = await Notefication.create({
+      recipient: admin._id,
+      sender: req.user._id,
+      targetRole: "admin",
+      message: `New enrollment in a paid course by ${student.user.name}: ${enrollment.course.title}`,
+      course: enrollment.course._id,
+    });
     req.flash("success", "Payment successful. You can now access the course.");
 
     return res.redirect("/student/my-courses");
@@ -438,6 +472,28 @@ student_payments_get = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+student_notifications_get = async (req, res) => {
+  try {
+    const student = await Student.findOne({ user: req.user._id }); // الحصول على الـ id الخاص بالطالب من التوكن
+
+    // تحديث حالة الإشعارات الغير مقروءة إلى مقروءة
+    await Notefication.updateMany(
+      { recipient: student._id, isRead: false },
+      { $set: { isRead: true } }
+    );
+
+    const notifications = await Notefication.find({ recipient: student._id }).populate({
+      path: "sender",
+      select: "name",
+      model: "User",
+    });
+
+    res.render("pages/student/notifications/all-notifications", { notifications, moment });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
 
 module.exports = {
   student_allCourses_get,
@@ -451,4 +507,5 @@ module.exports = {
   student_course_payment_get,
   student_course_payment_post,
   student_payments_get,
+  student_notifications_get,
 };
