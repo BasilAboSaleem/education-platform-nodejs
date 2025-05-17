@@ -8,20 +8,27 @@ A full-featured educational platform for displaying and selling courses. The sys
 ## 🚀 Key Features
 
 - Authentication system (register, login, logout)
+
 - **Admin Dashboard**:
   - Manage students (list, edit, delete, view, change status, search)
   - Manage teachers (list, add, edit, delete, view)
   - Manage courses (list, add, edit, delete, view details with lessons)
   - Approve/reject pending courses and lessons with rejection reasons
   - Manage categories (list, add, edit, delete, change status, search)
-  - **Notification System**: Admin can send notifications to:
-    - All students on the platform
-    - All teachers on the platform
-    - A specific student
-    - A specific teacher
-    - All students enrolled in a specific course  
-    Admin can also view all sent notifications in a dedicated page showing message, target, and course info if applicable.
-  - **Payment Report Section**: Fully integrated section to view, filter, and analyze all course payments, with internal tabs and branches for detailed reports.
+  - **Notification System**:
+    - Admin can send notifications to:
+      - All students on the platform
+      - All teachers on the platform
+      - A specific student
+      - A specific teacher
+      - All students enrolled in a specific course
+    - Admin can view all sent notifications in a dedicated page showing the message, target, and course info (if applicable).
+    - Automatic notifications are triggered in the following scenarios:
+      - When a teacher adds or updates a course → the admin receives a notification.
+      - When the admin approves/rejects a course or lesson → the teacher receives a notification.
+      - When a course/lesson is approved → all enrolled students receive a notification.
+
+  - **Payment Report Section**: Fully integrated section to view, filter, and analyze all course payments, with internal tabs and branches for detailed reports:
     - All Payments
     - Payments by Course
     - Pending Payments
@@ -30,7 +37,15 @@ A full-featured educational platform for displaying and selling courses. The sys
 - **Teacher Dashboard**:
   - View and manage own courses and lessons
   - Add new courses and lessons
-  - **Payment Report Section**: Fully integrated section to view, filter, and analyze all course payments, with internal tabs and branches for detailed reports.
+  - **Notification System**:
+    - A page to **send notifications** to all students enrolled in a specific course.
+    - A notification inbox with two tabs:
+      - **Received Notifications**
+      - **Sent Notifications**
+    - Automatic notifications for teachers:
+      - When their course or lesson is approved/rejected by the admin.
+      - When a course update is approved or rejected.
+  - **Payment Report Section**:
     - All Payments
     - Payments by Course
     - Pending Payments
@@ -62,6 +77,7 @@ A full-featured educational platform for displaying and selling courses. The sys
   - **New Page**: Added a "Student Enrollment" page in the teacher dashboard to manage student enrollments
   - **New Page**: Added an "Enrollment Details" page to manage student enrollment information for teachers
   - **New Section**: Implemented the complete **Payment Report** section in the admin dashboard, with all subpages and detailed tabs
+  - **New Feature**: Added a complete **Notification System** for both admin and teacher dashboards, with support for automatic and manual notifications based on actions across the platform.
 
 🔧 Remaining: enrollment features, visitor page backend, and additional enhancements
 

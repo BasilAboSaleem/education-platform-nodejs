@@ -19,6 +19,7 @@ const fs = require('fs');
 const { model } = require("mongoose");
 const path = require("path");
 const { Parser } = require('json2csv');
+const { send, title } = require("process");
 
 
  // Configuration cloudinary اعدادات الكلاودنري
@@ -534,8 +535,23 @@ admin_teachers_search_get = async (req,res) => {
     try{
       const course = await Course.findByIdAndUpdate(req.params.id, {
         status: "Published"
-      }, { new: true });
-      req.flash('success', 'Course published successfully');    
+      }, { new: true }).populate({
+        path: 'teacher',
+        populate: {
+          path: 'user',
+          select: 'name'
+        }
+      });
+      // إرسال إشعار للمعلم
+      const notification = await Notification.create({
+        title: "Course Published",
+        message: `Your course "${course.title}" has been published.`,
+        recipient: course.teacher.user._id,
+        sender: req.user._id, 
+        course: course.title,
+        link: `/teacher/courses/${course._id}`,
+      });
+      req.flash('success', 'Course published successfully');
       res.redirect("/admin/pending-courses");
 
     }
@@ -549,8 +565,23 @@ admin_teachers_search_get = async (req,res) => {
       const course = await Course.findByIdAndUpdate(req.params.id, {
         status: "Rejected",
         rejectionReason: req.body.rejectionReason
-      }, { new: true });
-      req.flash('success', 'Course rejected successfully');    
+      }, { new: true }).populate({
+        path: 'teacher',
+        populate: {
+          path: 'user',
+          select: 'name'
+        }
+      });
+      // إرسال إشعار للمعلم
+      const notification = await Notification.create({
+        title: "Course Rejected",
+        message: `Your course "${course.title}" has been rejected. Reason: ${req.body.rejectionReason}`,
+        recipient: course.teacher.user._id,
+        sender: req.user._id, 
+        course: course.title,
+        link: `/teacher/courses/${course._id}`,
+      });
+      req.flash('success', 'Course rejected successfully');
       res.redirect("/admin/pending-courses");
 
     }
@@ -720,8 +751,42 @@ const filteredCourses = courses.filter(course =>
     try{
       const lesson = await Lesson.findByIdAndUpdate(req.params.id, {
         status: "Published"
-      }, { new: true });
-      req.flash('success', 'Lesson published successfully');    
+      }, { new: true }).populate({
+        path: 'course',
+        select: 'title teacher',
+        populate: {
+          path: 'teacher',
+          populate: {
+            path: 'user',
+            select: 'name'
+          }
+        }
+      });
+      // إضافة إشعار للمعلم
+      const notification = await Notification.create({
+        recipient: lesson.course.teacher.user._id,
+        sender: req.user._id,
+        title: "Lesson Published",
+        message: `Your lesson "${lesson.title}" has been published.`,
+      });
+      // إضافة إشعار للطالب
+      const enrollments = await Enrollment.find({ course: lesson.course._id }).populate({
+        path: 'student',
+        populate: {
+          path: 'user',
+          select: 'name'
+        }
+      });
+      for (const enrollment of enrollments) {
+        await Notification.create({
+          recipient: enrollment.student.user._id,
+          sender: req.user._id,
+          title: "Lesson Published",
+          message: `A new lesson "${lesson.title}" has been published in your course.`,
+          link: `/courses/${lesson.course._id}/lessons/${lesson._id}`, // رابط الدرس
+        });
+      }
+      req.flash('success', 'Lesson published successfully');
       res.redirect("/admin/pending-lessons");
 
     }
@@ -735,8 +800,25 @@ const filteredCourses = courses.filter(course =>
       const lesson = await Lesson.findByIdAndUpdate(req.params.id, {
         status: "Rejected",
         rejectionReason: req.body.rejectionReason
-      }, { new: true });
-      req.flash('success', 'Lesson rejected successfully');    
+      }, { new: true }).populate({
+        path: 'course',
+        select: 'title teacher',
+        populate: {
+          path: 'teacher',
+          populate: {
+            path: 'user',
+            select: 'name'
+          }
+        }
+      });
+      // إضافة إشعار للمعلم
+      const notification = await Notification.create({
+        recipient: lesson.course.teacher.user._id,
+        sender: req.user._id,
+        title: "Lesson Rejected",
+        message: `Your lesson "${lesson.title}" has been rejected. Reason: ${req.body.rejectionReason}`,
+      });
+      req.flash('success', 'Lesson rejected successfully');
       res.redirect("/admin/pending-lessons");
 
     }
@@ -1231,7 +1313,8 @@ admin_send_notification_post = async (req, res) => {
           recipient: student._id,
           message,
           title,
-          link
+          link,
+          sender: req.user._id
         });
       }
        req.flash('success', 'Notifications sent successfully');
@@ -1244,7 +1327,8 @@ admin_send_notification_post = async (req, res) => {
           recipient: teacher._id,
           message,
           title,
-          link
+          link,
+          sender: req.user._id
         });
       }
        req.flash('success', 'Notifications sent successfully');
@@ -1260,7 +1344,8 @@ admin_send_notification_post = async (req, res) => {
           recipient: enrollment.student._id,
           message,
           title,
-          link
+          link,
+          sender: req.user._id
         });
       }
        req.flash('success', 'Notifications sent successfully');
@@ -1284,7 +1369,8 @@ if (user.role.toLowerCase() !== expectedRole) {
         recipient: user._id,
         message,
         title,
-        link
+        link,
+        sender: req.user._id
       });
 
        req.flash('success', 'Notification sent successfully');
@@ -1302,26 +1388,28 @@ if (user.role.toLowerCase() !== expectedRole) {
   }
 }
 
-admin_notifications_get = async (req, res) => {
-  try{
-    const notifications = await Notification.find().populate({
-      path: 'recipient',
-      select: 'name role',
-      model: 'User'
-    })
-    .populate({
-      path: 'course',
-      select: 'title',
-      model: 'Course'
-    });
-    res.render("pages/admin/notifications/all-notifications", { notifications, moment });
 
+admin_notifications_get = async (req, res) => {
+  try {
+    const received = await Notification.find({ recipient: req.user._id })
+      .populate('sender', 'name role');
+
+    const sent = await Notification.find({ sender: req.user._id })
+      .populate('recipient', 'name role')
+      .populate('course', 'title');
+
+    res.render("pages/admin/notifications/all-notifications", {
+      tab: req.query.tab || 'received',
+      receivedNotifications: received,
+      sentNotifications: sent,
+      user: req.user,
+      moment
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error loading notifications');
   }
-  catch(err){
-    console.log(err);
-    res.status(500).send('Error viewing notifications');
-  }
-}
+};
 
 
 
@@ -1380,5 +1468,6 @@ module.exports = {
     admin_payments_successfulPayments_export_get,
     admin_send_notification_get,
     admin_send_notification_post,
+   
     admin_notifications_get,
    }

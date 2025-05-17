@@ -6,6 +6,7 @@ const Lesson = require("../models/lesson");
 const Category = require("../models/Category");
 const Enrollment = require("../models/enrollment");
 const Payment = require("../models/payment");
+const Notification = require("../models/notification");
 
 const { check, validationResult } = require("express-validator");
 const bcrypt = require('bcrypt');
@@ -20,6 +21,7 @@ const teacher = require("../models/teacher");
 const path = require("path");
 const enrollment = require("../models/enrollment");
 const { Parser } = require('json2csv');
+const { send } = require("process");
 
  // Configuration cloudinary اعدادات الكلاودنري
  cloudinary.config({ 
@@ -57,7 +59,7 @@ teacher_addCourse_post = async (req, res) => {
             const uploadedImage = result.secure_url;
 
             // ✅ البحث عن المعلم المرتبط بالمستخدم الحالي
-            const teacher = await Teachers.findOne({ user: req.user._id });
+            const teacher = await Teachers.findOne({ user: req.user._id }).populate({ path: 'user', model: 'User' , select: 'name email' });
 
             if (!teacher) {
                 req.flash("error", "Teacher not found.");
@@ -81,6 +83,21 @@ teacher_addCourse_post = async (req, res) => {
                 { $push: { courses: newCourse._id } },
                 { new: true }
             );
+
+            //ارسال اشعار للأدمن 
+            const admin = await User.findOne({ role: "Admin" });
+            if (admin) {
+                const notification = {
+                    title: "New Course Added",
+                    message: `A new course titled "${newCourse.title}" has been added by ${teacher.user.name}.`,
+                    recipient: admin._id,
+                    sender: teacher.user._id,
+                    targetRole: "admin",
+                    course: newCourse._id,
+                    link: '/admin/pending-courses',
+                };
+                await Notification.create(notification);
+            }
 
             // ✅ حذف الصورة من السيرفر المحلي بعد الرفع
             fs.unlinkSync(req.file.path);
@@ -791,6 +808,82 @@ teacher_paid_payments_export_get = async (req, res) => {
   }
   
 }
+
+teacher_send_notification_get = async (req, res) => {
+  try{
+    const teacher = await Teachers.findOne({user: req.user._id});
+
+    const courses = await Course.find({ teacher: teacher._id })
+
+    res.render("pages/teacher/notifications/send-notification", { courses });
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).send("Internal Server Error");
+  }
+  
+}
+teacher_send_notification_post = async (req, res) => {
+  try{
+    const { title, message , link } = req.body;
+    const teacher = await Teachers.findOne({user: req.user._id});
+    const course = await Course.findById(req.body.course);
+    if (!course) {
+      req.flash("error", "Course not found.");
+      return res.redirect("/teacher/send-notification");
+    }
+    const students = await Enrollment.find({ course: course._id }).populate({
+      path: "student",
+      populate: {
+        path: "user",
+        select: "name email"
+      }
+    });
+    // إرسال الإشعار إلى الطلاب
+    students.forEach(async student => {
+      await Notification.create({
+        title: title,
+        message: message,
+        recipient: student._id,
+        sender: teacher.user._id,
+        targetRole: "student",
+        course: course._id,
+        link: link
+      });
+      
+    });
+    
+    req.flash("success", "Notification sent successfully.");
+    res.redirect("/teacher/send-notification");
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
+teacher_notifications_get = async (req, res) => {
+ try {
+     const received = await Notification.find({ recipient: req.user._id })
+          .populate('sender', 'name role');
+    
+        const sent = await Notification.find({ sender: req.user._id })
+          .populate('recipient', 'name role')
+          .populate('course', 'title');
+    
+        res.render("pages/admin/notifications/all-notifications", {
+          tab: req.query.tab || 'received',
+          receivedNotifications: received,
+          sentNotifications: sent,
+          user: req.user,
+          moment
+        });
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('Error loading notifications');
+      }
+    };
+
 module.exports = {
     teacher_addCourse_get,
     teacher_addCourse_post,
@@ -816,4 +909,7 @@ module.exports = {
     teacher_payments_by_course_export_get,
     teacher_pending_payments_export_get,
     teacher_paid_payments_export_get,
+    teacher_send_notification_get,
+    teacher_send_notification_post,
+    teacher_notifications_get
 };

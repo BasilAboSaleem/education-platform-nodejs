@@ -16,11 +16,15 @@ const notificationSchema = new Schema({
     ref: 'User',
     default: null
   },
-
+sender: {
+  type: Schema.Types.ObjectId,
+  ref: 'User',
+  default: null
+},
   // لإشعار عام لمجموعة (طلاب، معلمين، أو الجميع)
   targetRole: {
     type: String,
-    enum: ['student', 'teacher', 'all'],
+    enum: ['student', 'teacher', 'admin', 'all'],
     default: null
   },
 
