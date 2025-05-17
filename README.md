@@ -9,6 +9,17 @@ A full-featured educational platform for displaying and selling courses. The sys
 
 - Authentication system (register, login, logout)
 
+- **Profile Section (New)**:
+  - All users (Admin, Teacher, Student) now have access to a dedicated **Profile Page**
+  - The profile displays full user information: name, email, address, phone number, join date, role, and profile image
+  - Users can **edit** the following fields:
+    - Name
+    - Email
+    - Password
+    - Phone Number
+    - Address
+    - Profile Picture
+
 - **Admin Dashboard**:
   - Manage students (list, edit, delete, view, change status, search)
   - Manage teachers (list, add, edit, delete, view)
@@ -65,24 +76,25 @@ A full-featured educational platform for displaying and selling courses. The sys
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Node.js, Express
-- **Database**: MongoDB with Mongoose
-- **Templating Engine**: EJS
-- **File Uploads**: Cloudinary
-- **UI**: Bootstrap, Admin Templates
+- **Backend**: Node.js, Express  
+- **Database**: MongoDB with Mongoose  
+- **Templating Engine**: EJS  
+- **File Uploads**: Cloudinary  
+- **UI**: Bootstrap, Admin Templates  
 
 ## 📌 Project Status
 
 ✅ About 85% of the core features are complete  
 🔧 **Recent Updates**:
-  - Fixed issues with course enrollment and payment processing
-  - Improved user flow for student course enrollment (both free and paid courses)
-  - Enhanced the admin dashboard for better management of courses and users
-  - Fixed bugs related to course payment redirection
-  - **New Page**: Added a "Student Enrollment" page in the teacher dashboard to manage student enrollments
-  - **New Page**: Added an "Enrollment Details" page to manage student enrollment information for teachers
-  - **New Section**: Implemented the complete **Payment Report** section in the admin dashboard, with all subpages and detailed tabs
-  - **New Feature**: Added a complete **Notification System** for admin, teacher, and student dashboards, with support for automatic and manual notifications based on actions across the platform.
+  - Fixed issues with course enrollment and payment processing  
+  - Improved user flow for student course enrollment (both free and paid courses)  
+  - Enhanced the admin dashboard for better management of courses and users  
+  - Fixed bugs related to course payment redirection  
+  - **New Page**: Added a "Student Enrollment" page in the teacher dashboard to manage student enrollments  
+  - **New Page**: Added an "Enrollment Details" page to manage student enrollment information for teachers  
+  - **New Section**: Implemented the complete **Payment Report** section in the admin dashboard, with all subpages and detailed tabs  
+  - **New Feature**: Added a complete **Notification System** for admin, teacher, and student dashboards, with support for automatic and manual notifications based on actions across the platform  
+  - **New Feature**: **Profile Pages for All Users** with ability to edit key personal information including name, email, password, phone number, address, and profile picture
 
 🔧 Remaining: enrollment features, visitor page backend, and additional enhancements
 
@@ -92,8 +104,8 @@ A full-featured educational platform for displaying and selling courses. The sys
 
 ## 📁 Structure & Notes
 
-- The project is under active development
-- More improvements, validation, and optimizations will be added soon
+- The project is under active development  
+- More improvements, validation, and optimizations will be added soon  
 
 ---
 

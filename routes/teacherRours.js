@@ -32,4 +32,7 @@ router.get("/teacher/payments/successfulPayments/export", requireAuth, isTeacher
 router.get("/teacher/send-notification", requireAuth, isTeacher, teacherController.teacher_send_notification_get);
 router.post("/teacher/send-notification", requireAuth, isTeacher, teacherController.teacher_send_notification_post);
 router.get("/teacher/notifications", requireAuth, isTeacher, teacherController.teacher_notifications_get);
+router.get("/teacher/profile", requireAuth, isTeacher, teacherController.teacher_profile_get);
+router.get("/teacher/profile/edit", requireAuth, isTeacher, teacherController.teacher_profile_edit_get);
+router.put("/teacher/profile/edit", requireAuth, isTeacher, upload.single('profilePicture'), teacherController.teacher_profile_edit_put);
 module.exports = router;

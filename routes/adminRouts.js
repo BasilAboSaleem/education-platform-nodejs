@@ -66,4 +66,7 @@ router.get("/admin/payments/successfulPayments/export", requireAuth, isAdmin, ad
 router.get("/admin/send-notification", requireAuth, isAdmin, adminController.admin_send_notification_get );
 router.post("/admin/send-notification", requireAuth, isAdmin, adminController.admin_send_notification_post );
 router.get("/admin/notifications", requireAuth, isAdmin, adminController.admin_notifications_get );
+router.get("/admin/profile", requireAuth, isAdmin, adminController.admin_profile_get );
+router.get("/admin/profile/edit", requireAuth, isAdmin, adminController.admin_profile_edit_get );
+router.put("/admin/profile/edit", requireAuth, isAdmin, upload.single('profilePicture'), adminController.admin_profile_edit_put );
 module.exports = router;

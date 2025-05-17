@@ -19,5 +19,8 @@ router.post("/student/course/:id/payment", requireAuth, isStudent, studentContro
 router.get("/student/payments", requireAuth, isStudent, studentController.student_payments_get);
 //router.get("/student/all-courses/course/:id/enroll", requireAuth, isStudent, studentController.student_enroll_course_post);
 router.get("/student/notifications", requireAuth, isStudent, studentController.student_notifications_get);
+router.get("/student/profile", requireAuth, isStudent, studentController.student_profile_get);
+router.get("/student/profile/edit", requireAuth, isStudent, studentController.student_profile_edit_get);
+router.put("/student/profile/edit", requireAuth, isStudent, upload.single('profilePicture'), studentController.student_profile_edit_put);
 
 module.exports = router;
