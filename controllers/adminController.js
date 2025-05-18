@@ -7,6 +7,7 @@ const Lesson = require("../models/lesson");
 const Payment = require("../models/payment");
 const Enrollment = require("../models/enrollment");
 const Notification = require("../models/notification");
+const Setting = require("../models/setting");
 const { check, validationResult } = require("express-validator");
 const bcrypt = require('bcrypt');
 var jwt = require("jsonwebtoken");
@@ -1515,8 +1516,78 @@ admin_profile_edit_put = async (req, res) => {
       return res.status(500).json({ message: "Internal server error" });
     }
   };
+admin_settings_get = async (req, res) => {
+  try{
+    let  settings = await Setting.findOne(); // Assuming you have a Setting model
+    if (!settings) {
+    settings = {
+      siteName: '',
+      siteEmail: '',
+      defaultLanguage: 'en',
+      allowRegistration: false,
+      maintenanceMode: false,
+      contactSection: {
+        title: '',
+        heading: '',
+        description: '',
+        specialOffer: {
+          text: '',
+          offerAmount: '',
+          validUntil: null,
+          link: ''
+        }
+      },
+      sliderItems: [],
+      aboutSection: {
+        title: '',
+        heading: '',
+        description: '',
+        buttonText: '',
+        accordion: []
+      },
+      footerText: '',
+      socialLinks: {
+        facebook: '',
+        twitter: '',
+        instagram: '',
+        linkedin: ''
+      }
+    };
+  }
+    res.render("pages/admin/settings/system-settings", { settings, moment });
 
-       
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).send('Error loading system settings');
+  }
+}
+
+admin_settings_put = async (req, res) => {
+  try {
+    const { siteName, siteDescription, siteLogo, siteEmail } = req.body;
+
+    // Assuming you have a Setting model and you're updating the settings
+    const settings = await Setting.findOneAndUpdate(
+      {},
+      { siteName, siteDescription, siteLogo, siteEmail },
+      { new: true }
+    );
+
+    if (!settings) {
+      return res.status(404).send('Settings not found');
+    }
+
+    req.flash('success', 'System settings updated successfully');
+    res.redirect('/admin/settings');
+
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).send('Error updating system settings');
+  }
+}
+
   
      
 module.exports = {
@@ -1578,4 +1649,6 @@ module.exports = {
     admin_profile_get,
     admin_profile_edit_get,
     admin_profile_edit_put,
+    admin_settings_get,
+    admin_settings_put,
    }

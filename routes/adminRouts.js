@@ -69,4 +69,6 @@ router.get("/admin/notifications", requireAuth, isAdmin, adminController.admin_n
 router.get("/admin/profile", requireAuth, isAdmin, adminController.admin_profile_get );
 router.get("/admin/profile/edit", requireAuth, isAdmin, adminController.admin_profile_edit_get );
 router.put("/admin/profile/edit", requireAuth, isAdmin, upload.single('profilePicture'), adminController.admin_profile_edit_put );
+router.get("/admin/settings", requireAuth, isAdmin, adminController.admin_settings_get );
+router.put("/admin/settings", requireAuth, isAdmin, adminController.admin_settings_put );
 module.exports = router;
