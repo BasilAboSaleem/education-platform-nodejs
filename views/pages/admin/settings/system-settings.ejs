@@ -209,45 +209,62 @@
           </div>
 
           <!-- Slider Items -->
-          <div class="section-title">Header Slider Items</div>
-          <div id="sliderItemsContainer">
-            <% settings.sliderItems.forEach(function(slide, index) { %>
-              <fieldset>
-                <legend>Slide <%= index + 1 %></legend>
+<div class="section-title">Header Slider Items</div>
+<div id="sliderItemsContainer">
+  <% settings.sliderItems.forEach(function(slide, index) { %>
+    <fieldset data-index="<%= index %>">
+      <legend>Slide <%= index + 1 %></legend>
 
-                <div class="form-group">
-                  <label for="sliderItems_<%= index %>_backgroundImage">Background Image URL</label>
-                  <input type="text" id="sliderItems_<%= index %>_backgroundImage" name="sliderItems[<%= index %>][backgroundImage]" value="<%= slide.backgroundImage %>" />
-                </div>
+      <button type="button" class="btn btn-danger btn-sm" onclick="removeSlide(this)">Delete Slide</button>
 
-                <div class="form-group">
-                  <label for="sliderItems_<%= index %>_category">Category</label>
-                  <input type="text" id="sliderItems_<%= index %>_category" name="sliderItems[<%= index %>][category]" value="<%= slide.category %>" />
-                </div>
-
-                <div class="form-group">
-                  <label for="sliderItems_<%= index %>_title">Title</label>
-                  <input type="text" id="sliderItems_<%= index %>_title" name="sliderItems[<%= index %>][title]" value="<%= slide.title %>" />
-                </div>
-
-                <div class="form-group">
-                  <label for="sliderItems_<%= index %>_description">Description</label>
-<textarea id="sliderItems_<%= index %>_description" name="sliderItems[<%= index %>][description]" rows="3"><%= slide.description %></textarea>
-</div>
-            <div class="form-group">
-              <label for="sliderItems_<%= index %>_buttonText">Button Text</label>
-              <input type="text" id="sliderItems_<%= index %>_buttonText" name="sliderItems[<%= index %>][buttonText]" value="<%= slide.buttonText %>" />
-            </div>
-
-            <div class="form-group">
-              <label for="sliderItems_<%= index %>_buttonLink">Button Link</label>
-              <input type="text" id="sliderItems_<%= index %>_buttonLink" name="sliderItems[<%= index %>][buttonLink]" value="<%= slide.buttonLink %>" />
-            </div>
-          </fieldset>
-        <% }); %>
+      <div class="form-group">
+        <label>Background Image URL</label>
+        <input type="text" name="sliderItems[<%= index %>][backgroundImage]" value="<%= slide.backgroundImage %>" />
       </div>
 
-      <button type="button" class="btn btn-primary" onclick="addNewSlide()">Add New Slide</button>
+      <div class="form-group">
+        <label>Category</label>
+        <input type="text" name="sliderItems[<%= index %>][category]" value="<%= slide.category %>" />
+      </div>
+
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" name="sliderItems[<%= index %>][title]" value="<%= slide.title %>" />
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="sliderItems[<%= index %>][description]" rows="3"><%= slide.description %></textarea>
+      </div>
+
+      <!-- ✅ الحقول الجديدة -->
+      <div class="form-group">
+        <label>Main Button Text</label>
+        <input type="text" name="sliderItems[<%= index %>][mainButtonText]" value="<%= slide.mainButtonText || '' %>" />
+      </div>
+
+      <div class="form-group">
+        <label>Main Button Link</label>
+        <input type="text" name="sliderItems[<%= index %>][mainButtonLink]" value="<%= slide.mainButtonLink || '' %>" />
+      </div>
+
+      <div class="form-group">
+        <label>Icon Button Text</label>
+        <input type="text" name="sliderItems[<%= index %>][iconButtonText]" value="<%= slide.iconButtonText || '' %>" />
+      </div>
+
+      <div class="form-group">
+        <label>Icon Button Link</label>
+        <input type="text" name="sliderItems[<%= index %>][iconButtonLink]" value="<%= slide.iconButtonLink || '' %>" />
+      </div>
+    </fieldset>
+  <% }); %>
+</div>
+
+
+<button type="button" class="btn btn-primary" onclick="addNewSlide()">Add New Slide</button>
+
+
 
       <!-- Contact Section -->
       <div class="section-title">Contact Section</div>
@@ -307,37 +324,63 @@
     const index = container.children.length;
 
     const fieldset = document.createElement('fieldset');
+    fieldset.setAttribute('data-index', index);
     fieldset.innerHTML = `
       <legend>Slide ${index + 1}</legend>
+      <button type="button" class="btn btn-danger btn-sm" onclick="removeSlide(this)">Delete Slide</button>
+
       <div class="form-group">
-        <label for="sliderItems_${index}_backgroundImage">Background Image URL</label>
-        <input type="text" id="sliderItems_${index}_backgroundImage" name="sliderItems[${index}][backgroundImage]" />
+        <label>Background Image URL</label>
+        <input type="text" name="sliderItems[${index}][backgroundImage]" />
       </div>
       <div class="form-group">
-        <label for="sliderItems_${index}_category">Category</label>
-        <input type="text" id="sliderItems_${index}_category" name="sliderItems[${index}][category]" />
+        <label>Category</label>
+        <input type="text" name="sliderItems[${index}][category]" />
       </div>
       <div class="form-group">
-        <label for="sliderItems_${index}_title">Title</label>
-        <input type="text" id="sliderItems_${index}_title" name="sliderItems[${index}][title]" />
+        <label>Title</label>
+        <input type="text" name="sliderItems[${index}][title]" />
       </div>
       <div class="form-group">
-        <label for="sliderItems_${index}_description">Description</label>
-        <textarea id="sliderItems_${index}_description" name="sliderItems[${index}][description]" rows="3"></textarea>
+        <label>Description</label>
+        <textarea name="sliderItems[${index}][description]" rows="3"></textarea>
       </div>
       <div class="form-group">
-        <label for="sliderItems_${index}_buttonText">Button Text</label>
-        <input type="text" id="sliderItems_${index}_buttonText" name="sliderItems[${index}][buttonText]" />
+        <label>Button Text</label>
+        <input type="text" name="sliderItems[${index}][buttonText]" />
       </div>
       <div class="form-group">
-        <label for="sliderItems_${index}_buttonLink">Button Link</label>
-        <input type="text" id="sliderItems_${index}_buttonLink" name="sliderItems[${index}][buttonLink]" />
+        <label>Button Link</label>
+        <input type="text" name="sliderItems[${index}][buttonLink]" />
       </div>
     `;
 
     container.appendChild(fieldset);
+    reindexSlides();
+  }
+
+  function removeSlide(button) {
+    const fieldset = button.closest('fieldset');
+    fieldset.remove();
+    reindexSlides();
+  }
+
+  function reindexSlides() {
+    const slides = document.querySelectorAll('#sliderItemsContainer fieldset');
+    slides.forEach((fieldset, newIndex) => {
+      fieldset.setAttribute('data-index', newIndex);
+      fieldset.querySelector('legend').textContent = `Slide ${newIndex + 1}`;
+
+      const inputs = fieldset.querySelectorAll('input, textarea');
+      inputs.forEach(input => {
+        const name = input.name;
+        const updatedName = name.replace(/sliderItems\[\d+\]/, `sliderItems[${newIndex}]`);
+        input.name = updatedName;
+      });
+    });
   }
 </script>
+
 
 <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
     <script src="/assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>

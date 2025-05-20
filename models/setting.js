@@ -44,8 +44,9 @@ const settingSchema = new mongoose.Schema({
   }
 },
 // Header sliderItems
- sliderItems: [
+sliderItems: [
   {
+    _id: { type: String, required: true }, // معرفه صراحة كـ String
     backgroundImage: { type: String, default: 'https://via.placeholder.com/1200x500?text=Slide+1' },
     category: { type: String, default: 'Our Courses' },
     title: { type: String, default: 'With Scholar Teachers, Everything Is Easier' },

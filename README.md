@@ -37,7 +37,7 @@ A full-featured educational platform for displaying and selling courses. The sys
     - Automatic notifications are triggered in the following scenarios:  
       - When a teacher adds or updates a course → the admin receives a notification  
       - When the admin approves/rejects a course or lesson → the teacher receives a notification  
-      - When a course/lesson is approved → all enrolled students receive a notification  
+      - When a course/lesson is approved → all enrolled students receive a notification
 
   - **Payment Report Section**: Fully integrated section to view, filter, and analyze all course payments, with internal tabs and branches for detailed reports:  
     - All Payments  
@@ -49,7 +49,10 @@ A full-featured educational platform for displaying and selling courses. The sys
     - Added a **Settings model** to store site-wide configurations  
     - Admin Dashboard now includes a **System Settings** section UI to display and edit settings such as About Section (title, heading, description, button text), Slider items, and more  
     - Frontend form for managing system settings is completed  
-    - Backend routes and controller logic to save and update these settings are planned next  
+    - ✅ **Backend Logic for Settings** is now fully implemented:  
+      - Admin can now **fully manage system settings** via the dashboard  
+      - This includes editing the **About Section**, **Sliders**, and other key homepage content  
+      - Settings are stored persistently in the database and affect what visitors see on the main site
 
 - **Teacher Dashboard**:  
   - View and manage own courses and lessons  
@@ -90,7 +93,7 @@ A full-featured educational platform for displaying and selling courses. The sys
 
 ## 📌 Project Status
 
-✅ About 85% of the core features are complete  
+✅ About 90% of the core features are complete  
 🔧 **Recent Updates**:  
 - Fixed issues with course enrollment and payment processing  
 - Improved user flow for student course enrollment (both free and paid courses)  
@@ -101,11 +104,14 @@ A full-featured educational platform for displaying and selling courses. The sys
 - **New Section**: Implemented the complete **Payment Report** section in the admin dashboard, with all subpages and detailed tabs  
 - **New Feature**: Added a complete **Notification System** for admin, teacher, and student dashboards, with support for automatic and manual notifications based on actions across the platform  
 - **New Feature**: **Profile Pages for All Users** with ability to edit key personal information including name, email, password, phone number, address, and profile picture  
-- **New Feature**: Added **Settings model and Admin System Settings UI** to manage global platform settings like About Section, Sliders, etc.
+- **New Feature**: **Settings model and Admin System Settings UI** to manage global platform settings like About Section, Sliders, etc.  
+- ✅ **Backend Logic for Settings** is now fully implemented:  
+  - Admin can now **fully manage system settings** via the dashboard  
+  - This includes editing the **About Section**, **Sliders**, and other key homepage content  
+  - Settings are stored persistently in the database and affect what visitors see on the main site
 
 🔧 Remaining:  
-- Backend API for saving/updating system settings  
-- Visitor page backend  
+- Final visitor page dynamic rendering based on settings data  
 - Final enrollment features and additional enhancements  
 
 ## 🧩 Planned Features
