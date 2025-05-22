@@ -864,6 +864,11 @@ teacher_send_notification_post = async (req, res) => {
 
 teacher_notifications_get = async (req, res) => {
  try {
+   // تحديث حالة الإشعارات الغير مقروءة إلى مقروءة
+      await Notification.updateMany(
+        { recipient: req.user._id, isRead: false },
+        { $set: { isRead: true } }
+      );
      const received = await Notification.find({ recipient: req.user._id })
           .populate('sender', 'name role');
     
@@ -871,7 +876,7 @@ teacher_notifications_get = async (req, res) => {
           .populate('recipient', 'name role')
           .populate('course', 'title');
     
-        res.render("pages/admin/notifications/all-notifications", {
+        res.render("pages/teacher/notifications/all-notifications", {
           tab: req.query.tab || 'received',
           receivedNotifications: received,
           sentNotifications: sent,

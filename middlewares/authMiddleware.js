@@ -1,5 +1,6 @@
 var jwt = require("jsonwebtoken");
 const UserModel = require("../models/user")
+const Notification = require("../models/notification")
 
 //دالة لفحص تسجيل الدخول قبل السماج للمستخدم بالذهاب للراوت المطلوب
 const requireAuth = (req,res,next) => {
@@ -43,6 +44,28 @@ const checkIfUser =  (req, res, next) => {
     next();
   }
 };
+//دالة لجلب الاشعارات الخاصة بالمستخدم
+const loadUserNotifications = async (req, res, next) => {
+  if (req.user) {
+    try {
+      const notifications = await Notification.find({ recipient: req.user._id })
+        .sort({ createdAt: -1 })
+        .limit(5); // آخر 5 إشعارات مثلاً
+
+      res.locals.notifications = notifications;
+      res.locals.notificationCount = notifications.length;
+    } catch (err) {
+      console.error('Error loading notifications:', err);
+      res.locals.notifications = [];
+      res.locals.notificationCount = 0;
+    }
+  } else {
+    res.locals.notifications = [];
+    res.locals.notificationCount = 0;
+  }
+  next();
+};
+//دوال لفحص صلاحيات المستخدم
 const isAdmin = (req, res, next) => {
     if (req.user && req.user.role === 'Admin') {
         next();
@@ -74,6 +97,7 @@ const isStudent = (req, res, next) => {
 module.exports = {
     requireAuth,
     checkIfUser,
+    loadUserNotifications,
     isAdmin,
     isTeacher,
     isStudent,

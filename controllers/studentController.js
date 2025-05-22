@@ -474,19 +474,18 @@ student_payments_get = async (req, res) => {
 };
 student_notifications_get = async (req, res) => {
   try {
-    const student = await Student.findOne({ user: req.user._id }); // الحصول على الـ id الخاص بالطالب من التوكن
 
     // تحديث حالة الإشعارات الغير مقروءة إلى مقروءة
     await Notefication.updateMany(
-      { recipient: student._id, isRead: false },
+      { recipient: req.user._id, isRead: false },
       { $set: { isRead: true } }
     );
-
-    const notifications = await Notefication.find({ recipient: student._id }).populate({
+// جلب جميع الإشعارات الخاصة بالمستخدم
+    const notifications = await Notefication.find({ recipient: req.user._id }).populate({
       path: "sender",
       select: "name",
       model: "User",
-    });
+    }).sort({ createdAt: -1 }); // ترتيب الإشعارات حسب تاريخ الإنشاء
 
     res.render("pages/student/notifications/all-notifications", { notifications, moment });
   } catch (err) {

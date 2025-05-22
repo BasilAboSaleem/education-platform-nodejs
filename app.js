@@ -31,7 +31,7 @@ const coreRoute = require('./routes/coreRoute');
 const adminRoute = require('./routes/adminRouts');
 const studentRoute = require('./routes/studentRoutes');
 const teacherRoute = require('./routes/teacherRours');
-const { checkIfUser, requireAuth } = require('./middlewares/authMiddleware');
+const { checkIfUser, requireAuth, loadUserNotifications } = require('./middlewares/authMiddleware');
 
 var cookieParser = require('cookie-parser')
 app.use(cookieParser())
@@ -73,6 +73,13 @@ mongoose
     res.locals.error = req.flash('error');
     next();
   });
+  // Middleware to set user in res.locals
+  app.use((req, res, next) => {
+    res.locals.user = req.user || null;
+    next();
+});
+// Middleware to load user notifications
+app.use(loadUserNotifications);
   app.use(coreRoute);
   app.use(authRoute);
   app.use(adminRoute);
