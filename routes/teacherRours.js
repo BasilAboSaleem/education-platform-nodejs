@@ -35,4 +35,8 @@ router.get("/teacher/notifications", requireAuth, isTeacher, teacherController.t
 router.get("/teacher/profile", requireAuth, isTeacher, teacherController.teacher_profile_get);
 router.get("/teacher/profile/edit", requireAuth, isTeacher, teacherController.teacher_profile_edit_get);
 router.put("/teacher/profile/edit", requireAuth, isTeacher, upload.single('profilePicture'), teacherController.teacher_profile_edit_put);
+router.post("/teacher/addTask", requireAuth, isTeacher, teacherController.teacher_addTask_post);
+router.delete("/teacher/deleteTask/:id", requireAuth, isTeacher, teacherController.teacher_deleteTask_delete);
+router.put("/teacher/tasks/:id/update-status", requireAuth, isTeacher, teacherController.teacher_updateTaskStatus_put);
+
 module.exports = router;

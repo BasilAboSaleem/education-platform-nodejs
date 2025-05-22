@@ -22,5 +22,8 @@ router.get("/student/notifications", requireAuth, isStudent, studentController.s
 router.get("/student/profile", requireAuth, isStudent, studentController.student_profile_get);
 router.get("/student/profile/edit", requireAuth, isStudent, studentController.student_profile_edit_get);
 router.put("/student/profile/edit", requireAuth, isStudent, upload.single('profilePicture'), studentController.student_profile_edit_put);
+router.post("/student/addTask", requireAuth, isStudent, studentController.student_addTask_post);
+router.delete("/student/deleteTask/:id", requireAuth, isStudent, studentController.student_deleteTask_delete);
+router.put("/student/tasks/:id/update-status", requireAuth, isStudent, studentController.student_updateTaskStatus_put);
 
 module.exports = router;

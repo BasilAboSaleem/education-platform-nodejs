@@ -20,6 +20,16 @@ A full-featured educational platform for displaying and selling courses. The sys
     - Address  
     - Profile Picture
 
+- **Task Management System (New)**:  
+  - Each user (Admin, Teacher, Student) now has a personal **To-Do List**  
+  - Users can:
+    - **Add** new tasks
+    - **Delete** existing tasks
+    - **Mark** tasks as **done**
+  - Tasks are user-specific and stored in the database
+  - Tasks that are overdue (expired) are automatically marked as expired based on their due date
+  - UI includes dynamic checkbox behavior (strike-through effect for done/expired tasks)
+
 - **Admin Dashboard**:  
   - Manage students (list, edit, delete, view, change status, search)  
   - Manage teachers (list, add, edit, delete, view)  
@@ -108,7 +118,8 @@ A full-featured educational platform for displaying and selling courses. The sys
 - ✅ **Backend Logic for Settings** is now fully implemented:  
   - Admin can now **fully manage system settings** via the dashboard  
   - This includes editing the **About Section**, **Sliders**, and other key homepage content  
-  - Settings are stored persistently in the database and affect what visitors see on the main site
+  - Settings are stored persistently in the database and affect what visitors see on the main site  
+- **New Feature**: **Task Management System** in all dashboards with full CRUD support per user and auto-expiry status.
 
 🔧 Remaining:  
 - Final visitor page dynamic rendering based on settings data  
