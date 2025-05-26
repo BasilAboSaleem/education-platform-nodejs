@@ -1,3 +1,4 @@
+
 <% if (user.role === 'Admin' || user.role === 'Teacher') { %>
     <div class="row flex-grow">
       <div class="col-12 grid-margin stretch-card">
@@ -32,18 +33,20 @@
             <div class="d-sm-flex align-items-center mt-1 justify-content-between">
               <div class="d-sm-flex align-items-center mt-4 justify-content-between">
                 <% if (user.role === 'Admin') { %>
-                  <h2 class="me-2 fw-bold">$120,450.00</h2>
+                  <h2 class="me-2 fw-bold">$<%= totalRevenue %></h2>
                   <h4 class="me-2">Total Revenue</h4>
                 <% } else if (user.role === 'Teacher') { %>
-                  <h2 class="me-2 fw-bold">$4,520.00</h2>
+                  <h2 class="me-2 fw-bold">$<%= totalRevenue %></h2>
                   <h4 class="me-2">Your Earnings</h4>
                 <% } %>
-                <h4 class="text-success">(+2.1%)</h4>
+                  <h4 class="text-success">(+2.1%) <!-- Static placeholder --></h4>
               </div>
               <div class="me-3">
+
                 <div id="marketingOverview-legend"></div>
               </div>
             </div>
+            
             <div class="chartjs-bar-wrapper mt-3">
               <canvas id="marketingOverview"></canvas>
             </div>
@@ -52,4 +55,7 @@
       </div>
     </div>
   <% } %>
+
+  
+
   

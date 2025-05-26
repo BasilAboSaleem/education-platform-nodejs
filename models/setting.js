@@ -6,7 +6,7 @@ const settingSchema = new mongoose.Schema({
   },
   siteLogo: {
     type: String,
-    default: 'https://via.placeholder.com/150x50/eeeeee/555555?text=Logo'
+    default: 'https://res.cloudinary.com/djkxuvpby/image/upload/v1748073481/ChatGPT_Image_May_24_2025_10_53_37_AM_nx209b.png'
   },
   siteEmail: {
     type: String,
@@ -46,7 +46,7 @@ const settingSchema = new mongoose.Schema({
 // Header sliderItems
 sliderItems: [
   {
-    _id: { type: String, required: true }, // معرفه صراحة كـ String
+    _id: { type: String, required: true }, 
     backgroundImage: { type: String, default: 'https://via.placeholder.com/1200x500?text=Slide+1' },
     category: { type: String, default: 'Our Courses' },
     title: { type: String, default: 'With Scholar Teachers, Everything Is Easier' },

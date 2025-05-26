@@ -1555,7 +1555,7 @@ admin_settings_get = async (req, res) => {
       }
     };
   }
-    res.render("pages/admin/settings/system-settings", { settings, moment });
+    res.render("pages/admin/settings/system-settings", { settings, moment , logo: settings.siteLogo || '' });
 
   }
   catch(err){
