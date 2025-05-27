@@ -7,7 +7,8 @@ A full-featured educational platform for displaying and selling courses. The sys
 
 ## 🚀 Key Features
 
-- Authentication system (register, login, logout)
+- Authentication system (register, login, logout)  
+  - ✅ **New**: Added **Two-Factor Authentication (2FA)** during new user registration for enhanced security. After registering, users are required to verify their identity via a second factor (e.g., email code) before accessing their dashboard.
 
 - **Profile Section (New)**:  
   - All users (Admin, Teacher, Student) now have access to a dedicated **Profile Page**  
@@ -119,7 +120,8 @@ A full-featured educational platform for displaying and selling courses. The sys
   - Admin can now **fully manage system settings** via the dashboard  
   - This includes editing the **About Section**, **Sliders**, and other key homepage content  
   - Settings are stored persistently in the database and affect what visitors see on the main site  
-- **New Feature**: **Task Management System** in all dashboards with full CRUD support per user and auto-expiry status.
+- **New Feature**: **Task Management System** in all dashboards with full CRUD support per user and auto-expiry status.  
+- ✅ **New Feature**: Implemented **Two-Factor Authentication (2FA)** on new user registrations to enhance platform security.
 
 🔧 Remaining:  
 - Final visitor page dynamic rendering based on settings data  

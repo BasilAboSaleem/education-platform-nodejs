@@ -32,7 +32,6 @@ const { v4: uuidv4 } = require('uuid');
 });
 
 
-
 admin_students_get = async (req,res) => {
     try{
         const students = await Student.find().populate('user').sort({createdAt: -1}).lean() //populate هيك صار يدمج مودل اليوزر مع مودل الستودنت وبقدر اوصل لبيانات الاثنين lean سرعة في عرض البيانات sort ترتيب حسب التاريخ الاحدث فوق والاقدم تحت
@@ -265,7 +264,7 @@ admin_students_status_put = async (req, res) => {
   };
   admin_add_teacher_get = async (req,res) => {
     try{
-        res.render("pages/admin/teachers/add-teacher")
+        res.render("pages/admin/teachers/add-teacher", {moment: moment}) //moment مكتبة لتنسيق التاريخ والوقت
     }
     catch(err){
         console.log(err)
@@ -313,8 +312,16 @@ admin_teachers_search_get = async (req,res) => {
     }
   }
 
-  admin_add_category_get = (req,res) => {
-    res.render("pages/admin/categories/add-categorie")
+  admin_add_category_get = async (req,res) => {
+    try{
+    res.render("pages/admin/categories/add-categorie", {moment: moment})
+
+    }
+    catch(err){
+      console.log(err); 
+      res.status(500).send("Error while rendering add category page");
+
+    }
   }
   admin_add_category_post = async (req, res) => {
     try {

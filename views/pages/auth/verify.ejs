@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - Learnova</title>
+  <title>Verify Your Email - Learnova</title>
   <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
   <link rel="stylesheet" href="assets/css/fontawesome.css" />
   <link rel="stylesheet" href="assets/css/templatemo-scholar.css" />
@@ -16,12 +16,11 @@
     form fieldset {
       margin-bottom: 20px;
     }
-    #emailError,
-      #passwordError {
-        color: #ff5d79;
-        margin-left: 0.4rem;
-        font-weight: 600;
-      }
+    #otpError {
+      color: #ff5d79;
+      margin-left: 0.4rem;
+      font-weight: 600;
+    }
   </style>
 </head>
 
@@ -32,7 +31,7 @@
       <div class="row">
         <div class="col-12">
           <nav class="main-nav">
-            <a href="/" class="logo"><h1>Scholar</h1></a>
+            <a href="/" class="logo"><h1>Learnova</h1></a>
             <ul class="nav">
               <li><a href="/" class="active">Home</a></li>
               <li><a href="register" class="btn btn-outline-primary">Register</a></li>
@@ -44,38 +43,29 @@
     </div>
   </header>
 
-  <!-- Login Section -->
+  <!-- Verify Section -->
   <section class="contact-us section" style="margin-top: 80px;">
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-lg-6">
-          <form id="loginForm" action="/login" method="post">
+          <form id="verifyForm" action="/verify" method="post">
             <div class="row">
               <div class="col-lg-12">
-                <h2 class="text-center mb-4">Login to Your Account</h2>
+                <h2 class="text-center mb-4">Verify Your Email</h2>
               </div>
               <div class="col-lg-12">
                 <fieldset>
-                  <input type="email" name="email" id="emailId" class="form-control" placeholder="Email" required />
-                  <span id="emailError" ></span> <!-- عنصر لعرض الخطأ -->
-
+                  <input type="text" name="otp" id="otpId" class="form-control" placeholder="Enter Verification Code" required />
+                  <span id="otpError"></span> <!-- عنصر لعرض الخطأ -->
                 </fieldset>
               </div>
               <div class="col-lg-12">
                 <fieldset>
-                  <input type="password" name="password" id="passwordId" class="form-control" placeholder="Password" required />
-                  <span id="passwordError" ></span> <!-- عنصر لعرض الخطأ -->
-
-                </fieldset>
-              </div>
-            
-              <div class="col-lg-12">
-                <fieldset>
-                  <button type="submit" id="login-submit" class="btn btn-primary w-100">Login</button>
+                  <button type="submit" id="verify-submit" class="btn btn-primary w-100">Verify</button>
                 </fieldset>
               </div>
               <div class="col-lg-12 text-center mt-3">
-                <p>Don't have an account? <a href="/register">Register here</a></p>
+                <p>Didn't receive the code? <a href="/resend-verification">Resend</a></p>
               </div>
             </div>
           </form>
@@ -86,45 +76,35 @@
 
   <!-- Scripts -->
   <script>
-    const form = document.getElementById("loginForm");
-  
+    const form = document.getElementById("verifyForm");
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-  
+
       // إخفاء الأخطاء القديمة
-      document.getElementById("emailError").textContent = "";
-      document.getElementById("passwordError").textContent = "";
-  
+      document.getElementById("otpError").textContent = "";
+
       const formData = {
-        email: document.getElementById("emailId").value,
-        password: document.getElementById("passwordId").value,
+        otp: document.getElementById("otpId").value,
       };
-  
-      const res = await fetch("/login", {
+
+      const res = await fetch("/verify", {
         method: "POST",
         body: JSON.stringify(formData),
         headers: { "Content-Type": "application/json" },
       });
-  
+
       const data = await res.json();
-  
-      // التحقق من الاستجابة بشكل كامل
+
       console.log(data); // عرض المحتوى بالكامل في الـ console
-  
-      // إذا كانت هناك أخطاء في الاستجابة
-      if (data.notFoundEmail) {
-        document.getElementById("emailError").textContent = "Please provide a valid email OR register";
-        console.log(data.notFoundEmail);
+
+      if (data.invalidOtp) {
+        document.getElementById("otpError").textContent = "Invalid verification code. Please try again.";
+        console.log(data.invalidOtp);
       }
-  
-      if (data.errPassword) {  // تأكد من استخدام نفس المفتاح في الكود
-        console.log(data.errPassword);  // هنا استخدمنا data.errPassword
-        document.getElementById("passwordError").textContent = "Please provide a valid password";
-      }
-      
-      // إذا كانت الاستجابة تحتوي على success و redirectTo
+
       if (data.success && data.redirectTo) {
-        window.location.href = data.redirectTo; // إعادة التوجيه إلى صفحة الداشبورد
+        window.location.href = data.redirectTo; // إعادة التوجيه إلى الصفحة المطلوبة بعد التحقق
       }
     });
   </script>

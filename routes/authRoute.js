@@ -16,6 +16,8 @@ router.post("/register",  [
   authController.regester_post
 
 )
+router.get("/verify",  authController.verify_get)
+router.post("/verify", authController.verify_post)
 
 router.get("/login" ,authController.login_get)
 router.post("/login", authController.login_post)

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
+
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
@@ -11,6 +12,13 @@ const userSchema = new mongoose.Schema({
     default: 'Student'
   },
   profilePicture: { type: String }, // رابط الصورة الشخصية
+   // الحقول الخاصة بالمصادقة الثنائية
+  isVerified: {
+     type: Boolean,
+     default: false
+     },
+  otp: String,
+  otpExpires: Date,
 }, { timestamps: true });
 
 // تشفير كلمة المرور قبل الحفظ
@@ -24,6 +32,7 @@ userSchema.pre('save', async function(next) {
 // التحقق من كلمة المرور عند تسجيل الدخول
 /*userSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
-};*/
+}
+  ;*/
 
 module.exports = mongoose.models.User || mongoose.model('User', userSchema);
