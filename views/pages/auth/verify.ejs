@@ -12,14 +12,18 @@
   <link rel="stylesheet" href="assets/css/animate.css" />
   <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
   <style>
-    /* إضافة تباعد بين الحقول */
     form fieldset {
       margin-bottom: 20px;
     }
+
     #otpError {
       color: #ff5d79;
       margin-left: 0.4rem;
       font-weight: 600;
+    }
+
+    #resendMessage {
+      font-weight: 500;
     }
   </style>
 </head>
@@ -56,7 +60,7 @@
               <div class="col-lg-12">
                 <fieldset>
                   <input type="text" name="otp" id="otpId" class="form-control" placeholder="Enter Verification Code" required />
-                  <span id="otpError"></span> <!-- عنصر لعرض الخطأ -->
+                  <span id="otpError"></span>
                 </fieldset>
               </div>
               <div class="col-lg-12">
@@ -65,7 +69,10 @@
                 </fieldset>
               </div>
               <div class="col-lg-12 text-center mt-3">
-                <p>Didn't receive the code? <a href="/resend-verification">Resend</a></p>
+                <p>Didn't receive the code? 
+                  <button type="button" id="resendBtn" class="btn btn-link p-0" style="color: #007bff; text-decoration: underline;">Resend</button>
+                </p>
+                <span id="resendMessage"></span>
               </div>
             </div>
           </form>
@@ -74,41 +81,83 @@
     </div>
   </section>
 
-  <!-- Scripts -->
+  <!-- Verify script -->
   <script>
     const form = document.getElementById("verifyForm");
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      // إخفاء الأخطاء القديمة
-      document.getElementById("otpError").textContent = "";
+      const errorDiv = document.getElementById("otpError");
+      errorDiv.textContent = "";
 
       const formData = {
         otp: document.getElementById("otpId").value,
       };
 
-      const res = await fetch("/verify", {
-        method: "POST",
-        body: JSON.stringify(formData),
-        headers: { "Content-Type": "application/json" },
-      });
+      try {
+        const res = await fetch("/verify", {
+          method: "POST",
+          body: JSON.stringify(formData),
+          headers: { "Content-Type": "application/json" },
+        });
 
-      const data = await res.json();
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          errorDiv.textContent = "Unexpected response from server.";
+          console.error("Response not JSON:", text);
+          return;
+        }
 
-      console.log(data); // عرض المحتوى بالكامل في الـ console
+        if (data.invalidOtp) {
+          errorDiv.textContent = "Invalid verification code. Please try again.";
+        } else if (data.blocked) {
+          errorDiv.textContent = data.message || "Too many attempts. Try again later.";
+        } else if (data.success && data.redirectTo) {
+          window.location.href = data.redirectTo;
+        } else {
+          errorDiv.textContent = "An unexpected error occurred. Please try again.";
+        }
 
-      if (data.invalidOtp) {
-        document.getElementById("otpError").textContent = "Invalid verification code. Please try again.";
-        console.log(data.invalidOtp);
+      } catch (error) {
+        errorDiv.textContent = "Network error. Please try again later.";
+        console.error(error);
       }
+    });
 
-      if (data.success && data.redirectTo) {
-        window.location.href = data.redirectTo; // إعادة التوجيه إلى الصفحة المطلوبة بعد التحقق
+    // Resend code handler
+    document.getElementById("resendBtn").addEventListener("click", async () => {
+      const msgEl = document.getElementById("resendMessage");
+      msgEl.textContent = "";
+      msgEl.style.color = "#007bff";
+
+      try {
+        const res = await fetch("/verify/resend", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          msgEl.style.color = "green";
+          msgEl.textContent = "Verification code has been resent to your email.";
+        } else {
+          msgEl.style.color = "red";
+          msgEl.textContent = data.message || "Error resending code.";
+        }
+      } catch (err) {
+        msgEl.style.color = "red";
+        msgEl.textContent = "Network error. Please try again.";
+        console.error(err);
       }
     });
   </script>
 
+  <!-- External Scripts -->
   <script src="vendor/jquery/jquery.min.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
   <script src="assets/js/isotope.min.js"></script>
