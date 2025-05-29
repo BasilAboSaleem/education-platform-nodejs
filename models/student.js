@@ -9,8 +9,8 @@ const studentSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['Active', 'Pending', 'Inactive'],
-    default: 'Active',
+    enum: ['Unverified', 'Active', 'Pending', 'Inactive'],
+    default: 'Unverified',
   },
   
   phone: {

@@ -344,19 +344,25 @@ teacher_student_enrollments_get = async (req, res) => {
       const teacher = await Teachers.findOne({user: req.user.id}) // المعلم الحالي 
       const searchQuery = req.query.query?.toLowerCase() || ""; // استعلام البحث
   
-      let studentEnrollments = await Enrollment.find()
-        .populate({
-          path: "course",
-          match: { teacher: teacher._id }, // فلترة الكورسات التي تخص المعلم فقط يعني شرط
-        })
-        .populate({
-          path: "student",
-          populate: {
-            path: "user",
-            model: "User",
-            select: "name email",
-          },
-        });
+     // جلب جميع كورسات المعلم (نجيب _id فقط)
+const courses = await Course.find({ teacher: teacher._id }).select('_id');
+
+// استعلام التسجيلات التي تكون كورساتها ضمن كورسات المعلم فقط
+const studentEnrollments = await Enrollment.find({
+  course: { $in: courses.map(c => c._id) }
+})
+.populate({
+  path: "course",
+  select: "title teacher", // اختيار الحقول التي تريدها
+})
+.populate({
+  path: "student",
+  populate: {
+    path: "user",
+    model: "User",
+    select: "name email",
+  },
+});
          // فلترة حسب حقل البحث الموحد
     if (searchQuery) {
         studentEnrollments = studentEnrollments.filter((enroll) => {
@@ -402,169 +408,238 @@ teacher_student_enrollments_get = async (req, res) => {
     }
   } 
 teacher_payments_get = async (req, res) => {
-    try{
-      const searchQuery = req.query.query?.toLowerCase() || ""; // استعلام البحث
-        // 1. الحصول على المعلم الحالي
-        const teacher = await Teachers.findOne({user: req.user._id});
-        // 2. الحصول على كل الكورسات التي يملكها هذا المعلم
-const courses = await Course.find({ teacher: teacher._id });
-const courseIds = courses.map(course => course._id);
+  try {
+    const searchQuery = req.query.query?.toLowerCase() || "";
 
-// 3. الحصول على كل الانرولمنتات المرتبطة بهذه الكورسات
-const enrollments = await Enrollment.find({ course: { $in: courseIds } });
-const enrollmentIds = enrollments.map(e => e._id);
+    // 1. الحصول على المعلم الحالي
+    const teacher = await Teachers.findOne({ user: req.user._id });
 
-// 4. الحصول على كل البيمنتات المرتبطة بهذه الانرولمنتات
-const payments = await Payment.find({ enrollment: { $in: enrollmentIds } })
-  .populate({
-    path: "enrollment",
-    populate: { path: "course", select: "title" }
-  })
-  .populate({
-    path: "enrollment",
-    populate: {
-      path: "student",
-      populate: { path: "user", select: "name email" }
-    }
-  });
+    // 2. الحصول على الكورسات التي يملكها هذا المعلم
+    const courses = await Course.find({ teacher: teacher._id });
+    const courseIds = courses.map(course => course._id);
 
+    // 3. الحصول على الانرولمنتات المرتبطة بهذه الكورسات
+    const enrollments = await Enrollment.find({ course: { $in: courseIds } });
+    const enrollmentIds = enrollments.map(e => e._id);
 
-         // إضافة تجميع المدفوعات التي تمت 
-              const result = await Payment.aggregate([
-                {
-                 $match: { paymentStatus: { $in: ['paid', 'unpaid'] } }// فقط المدفوعات المكتملة
-                },
-                {
-                  $group: {
-                    _id: null,
-                    totalPayment: { $sum: "$amount" }
-                  }
-                }
-              ]);
-              //اضافة مجموع المدفوعات المتوقعة البنديح
-              const result2 = await Payment.aggregate([
-                {
-                  $match: { paymentStatus: 'unpaid' } // فقط المدفوعات المكتملة
-                },
-                {
-                  $group: {
-                    _id: null,
-                    totalPayment: { $sum: "$amount" }
-                  }
-                }
-              ]);
-              // $match: { paymentStatus: 'paid' }  فقط المدفوع
-              const result3 = await Payment.aggregate([
-                {
-                  $match: { paymentStatus: 'paid' } // فقط المدفوعات المكتملة
-                },
-                {
-                  $group: {
-                    _id: null,
-                    totalPayment: { $sum: "$amount" }
-                  }
-                }
-              ]);
-              // تجميع المدفوعات حسب اسم الكورس
-        const paymentByCourse = await Payment.aggregate([
-          {
-            // نربط بين Collection المدفوعات (Payment) والانرولمنتس (Enrollments)
-            $lookup: {
-              from: 'enrollments',               // الكولكشن الثاني اللي بدنا نربط معه
-              localField: 'enrollment',          // الحقل في وثيقة Payment اللي يحتوي ObjectId لـ enrollment
-              foreignField: '_id',               // الحقل في وثيقة Enrollment اللي راح نطابق عليه
-              as: 'enrollment'                   // اسم الحقل الجديد اللي راح يحتوي بيانات الانرولمنت المطابقة
+    // 4. جلب كل البيمنتات المرتبطة بهذه الانرولمنتات مع البوبليت
+    const payments = await Payment.find({ enrollment: { $in: enrollmentIds } })
+      .populate({
+        path: "enrollment",
+        populate: { path: "course", select: "title" }
+      })
+      .populate({
+        path: "enrollment",
+        populate: {
+          path: "student",
+          populate: { path: "user", select: "name email" }
+        }
+      });
+
+    // 5. تجميع المدفوعات (paid + unpaid) مع تصفية حسب المعلم
+    const result = await Payment.aggregate([
+      {
+        $lookup: {
+          from: 'enrollments',
+          localField: 'enrollment',
+          foreignField: '_id',
+          as: 'enrollment'
+        }
+      },
+      { $unwind: "$enrollment" },
+      {
+        $lookup: {
+          from: 'courses',
+          localField: 'enrollment.course',
+          foreignField: '_id',
+          as: 'course'
+        }
+      },
+      { $unwind: "$course" },
+      {
+        $match: {
+          "course.teacher": teacher._id,
+          paymentStatus: { $in: ['paid', 'unpaid'] }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalPayment: { $sum: "$amount" }
+        }
+      }
+    ]);
+
+    // 6. تجميع المدفوعات غير المدفوعة (unpaid) فقط
+    const result2 = await Payment.aggregate([
+      {
+        $lookup: {
+          from: 'enrollments',
+          localField: 'enrollment',
+          foreignField: '_id',
+          as: 'enrollment'
+        }
+      },
+      { $unwind: "$enrollment" },
+      {
+        $lookup: {
+          from: 'courses',
+          localField: 'enrollment.course',
+          foreignField: '_id',
+          as: 'course'
+        }
+      },
+      { $unwind: "$course" },
+      {
+        $match: {
+          "course.teacher": teacher._id,
+          paymentStatus: 'unpaid'
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalPayment: { $sum: "$amount" }
+        }
+      }
+    ]);
+
+    // 7. تجميع المدفوعات المدفوعة (paid) فقط
+    const result3 = await Payment.aggregate([
+      {
+        $lookup: {
+          from: 'enrollments',
+          localField: 'enrollment',
+          foreignField: '_id',
+          as: 'enrollment'
+        }
+      },
+      { $unwind: "$enrollment" },
+      {
+        $lookup: {
+          from: 'courses',
+          localField: 'enrollment.course',
+          foreignField: '_id',
+          as: 'course'
+        }
+      },
+      { $unwind: "$course" },
+      {
+        $match: {
+          "course.teacher": teacher._id,
+          paymentStatus: 'paid'
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalPayment: { $sum: "$amount" }
+        }
+      }
+    ]);
+
+    // 8. تجميع المدفوعات حسب الكورس مع عدّ الطلاب
+    const paymentByCourse = await Payment.aggregate([
+      {
+        $lookup: {
+          from: 'enrollments',
+          localField: 'enrollment',
+          foreignField: '_id',
+          as: 'enrollment'
+        }
+      },
+      { $unwind: "$enrollment" },
+      {
+        $lookup: {
+          from: 'courses',
+          localField: 'enrollment.course',
+          foreignField: '_id',
+          as: 'course'
+        }
+      },
+      { $unwind: "$course" },
+      {
+        $match: {
+          "course.teacher": teacher._id
+        }
+      },
+      {
+        $group: {
+          _id: "$course._id",
+          courseTitle: { $first: "$course.title" },
+          totalPayment: { $sum: "$amount" },
+          pendingPayment: {
+            $sum: {
+              $cond: [{ $eq: ["$paymentStatus", "unpaid"] }, "$amount", 0]
             }
           },
-          {
-            // لأن $lookup بيرجع مصفوفة، نستخدم $unwind لتحويلها إلى كائن واحد بدل مصفوفة
-            $unwind: "$enrollment"
-          },
-          {
-            // نربط الآن بين enrollment الموجود داخل كل payment وبين جدول الكورسات
-            $lookup: {
-              from: 'courses',                   // الكولكشن الثاني (Courses)
-              localField: 'enrollment.course',   // الحقل داخل enrollment اللي فيه ObjectId الكورس
-              foreignField: '_id',               // الحقل في Course اللي راح نطابق عليه
-              as: 'course'                       // اسم الحقل الجديد اللي راح يحتوي الكورس المرتبط
+          successfulPayment: {
+            $sum: {
+              $cond: [{ $eq: ["$paymentStatus", "paid"] }, "$amount", 0]
             }
           },
-          {
-            // نفس الشي، نحول مصفوفة الكورسات إلى كائن واحد
-            $unwind: "$course"
-          },
-          {
-            // الآن نبدأ بتجميع النتائج لكل كورس
-            $group: {
-              _id: "$course._id",                      // كل كورس يكون مجموعة مستقلة حسب ID تبعه
-              courseTitle: { $first: "$course.title" },// نأخذ عنوان الكورس من أول وثيقة (كلها نفس العنوان)
-              totalPayment: { $sum: "$amount" },       // مجموع كل المبالغ المدفوعة أو غير المدفوعة لهذا الكورس
-              pendingPayment: {
-                $sum: {
-                  $cond: [                              // إذا الحالة unpaid، أضف المبلغ، غير هيك أضف 0
-                    { $eq: ["$paymentStatus", "unpaid"] },
-                    "$amount",
-                    0
-                  ]
-                }
-              },
-              successfulPayment: {
-                $sum: {
-                  $cond: [                              // إذا الحالة paid، أضف المبلغ، غير هيك أضف 0
-                    { $eq: ["$paymentStatus", "paid"] },
-                    "$amount",
-                    0
-                  ]
-                }
-              },
-              studentCount: { $addToSet: "$enrollment.student" } // نخزن معرفات الطلاب المرتبطين بهذا الكورس (بدون تكرار)
-            }
-          },
-          {
-            // عرض النتيجة النهائية، وعدد الطلاب نحسبه من حجم المصفوفة
-            $project: {
-              courseTitle: 1,
-              totalPayment: 1,
-              pendingPayment: 1,
-              successfulPayment: 1,
-              studentCount: { $size: "$studentCount" }  // حساب عدد الطلاب الفعليين المسجلين
-            }
-          }
-        ]);
-        
-              const totalPayment = result[0]?.totalPayment || 0;
-              const pendingPayment = result2[0]?.totalPayment || 0;
-              const successfullyPayment = result3[0]?.totalPayment || 0;
-        
-        const unpaidPayments = payments.filter(payment => payment.paymentStatus === 'unpaid');
-        const paidPayments = payments.filter(payment => payment.paymentStatus === 'paid');
-        // فلترة المدفوعات حسب استعلام البحث
-        const filteredPayments = payments.filter(payment => {
-  const transactionMatch = payment.transactionId?.toLowerCase().includes(searchQuery);
-  const studentNameMatch = payment.enrollment.student.user.name.toLowerCase().includes(searchQuery);
-  const courseTitleMatch = payment.enrollment.course.title.toLowerCase().includes(searchQuery);
-  const amountMatch = payment.amount.toString().includes(searchQuery);
-  const methodMatch = payment.paymentMethod?.toLowerCase().includes(searchQuery);
-  const statusMatch = payment.paymentStatus.toLowerCase().includes(searchQuery);
-  const dateMatch = moment(payment.createdAt).format("YYYY-MM-DD").includes(searchQuery);
+          studentCount: { $addToSet: "$enrollment.student" }
+        }
+      },
+      {
+        $project: {
+          courseTitle: 1,
+          totalPayment: 1,
+          pendingPayment: 1,
+          successfulPayment: 1,
+          studentCount: { $size: "$studentCount" }
+        }
+      }
+    ]);
 
-  return (
-    transactionMatch ||
-    studentNameMatch ||
-    courseTitleMatch ||
-    amountMatch ||
-    methodMatch ||
-    statusMatch ||
-    dateMatch
-  );
-});
+    // 9. استخراج القيم أو تعيين صفر إذا لم توجد بيانات
+    const totalPayment = result[0]?.totalPayment || 0;
+    const pendingPayment = result2[0]?.totalPayment || 0;
+    const successfullyPayment = result3[0]?.totalPayment || 0;
 
-        res.render("pages/teacher/payments/paymentReporte", { payments: filteredPayments, paymentByCourse, unpaidPayments, paidPayments, totalPayment, pendingPayment, successfullyPayment, moment: moment });
-    }
-    catch(err){
-        console.log(err);
-    }
-}
+    // 10. فلترة المدفوعات حسب استعلام البحث
+    const filteredPayments = payments.filter(payment => {
+      const transactionMatch = payment.transactionId?.toLowerCase().includes(searchQuery);
+      const studentNameMatch = payment.enrollment.student.user.name.toLowerCase().includes(searchQuery);
+      const courseTitleMatch = payment.enrollment.course.title.toLowerCase().includes(searchQuery);
+      const amountMatch = payment.amount.toString().includes(searchQuery);
+      const methodMatch = payment.paymentMethod?.toLowerCase().includes(searchQuery);
+      const statusMatch = payment.paymentStatus.toLowerCase().includes(searchQuery);
+      const dateMatch = moment(payment.createdAt).format("YYYY-MM-DD").includes(searchQuery);
+
+      return (
+        transactionMatch ||
+        studentNameMatch ||
+        courseTitleMatch ||
+        amountMatch ||
+        methodMatch ||
+        statusMatch ||
+        dateMatch
+      );
+    });
+
+    // 11. تصنيف المدفوعات حسب الحالة
+    const unpaidPayments = filteredPayments.filter(payment => payment.paymentStatus === 'unpaid');
+    const paidPayments = filteredPayments.filter(payment => payment.paymentStatus === 'paid');
+
+    // 12. إعادة العرض
+    res.render("pages/teacher/payments/paymentReporte", {
+      payments: filteredPayments,
+      paymentByCourse,
+      unpaidPayments,
+      paidPayments,
+      totalPayment,
+      pendingPayment,
+      successfullyPayment,
+      moment
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 
 teacher_payment_view_get = async (req, res) => {
   try{
@@ -916,101 +991,88 @@ teacher_profile_edit_get = async (req, res) => {
 
 teacher_profile_edit_put = async (req, res) => {
   try {
-      // 1. جلب بيانات المستخدم (User) والمعلم (Teacher) من قاعدة البيانات
-      const user = await User.findById(req.user._id).select("name email profilePicture password");
-      const teacher = await Teachers.findOne({ user: req.user._id });
-  
-      // التحقق من وجود المستخدم
-      if (!user) {
-        req.flash('error', 'User not found');
-        return res.redirect('/login'); // إعادة التوجيه لصفحة تسجيل الدخول
-      }
-
-      // التحقق من وجود المعلم
-      if (!teacher) {
-        req.flash('error', 'Teacher profile not found');
-        return res.redirect('/student/profile/edit'); // إعادة التوجيه لصفحة تعديل الملف
-      }
-  
-      // 2. تجهيز كائن البيانات الجديدة، مع الحفاظ على القيم القديمة إن لم تُرسل جديدة
-      const updatedUserData = {
-        name: req.body.name ?? user.name,
-        email: req.body.email ?? user.email,
-        profilePicture: user.profilePicture, // نبدأ بالصورة الحالية، ونحدثها لاحقًا إذا تم رفع صورة جديدة
-      };
-  
-      // 3. التعامل مع رفع صورة جديدة (إن وُجدت)
-      if (req.file) {
-        // حذف الصورة القديمة من Cloudinary إذا كانت موجودة
-        if (user.profilePicture) {
-          try {
-            await cloudinary.uploader.destroy(user.profilePicture);
-          } catch (err) {
-            console.error("Error deleting old image from Cloudinary:", err);
-            // الخطأ هنا غير حرج، نكمل التحديث
-          }
-        }
-  
-        // رفع الصورة الجديدة إلى Cloudinary
-        const uploadResult = await cloudinary.uploader.upload(req.file.path, {
-          folder: "LMS/courses", // تعديل المسار حسب تنظيم مشروعك
-          use_filename: true,
-          unique_filename: false,
-        });
-  
-        // تحديث رابط الصورة والمعرف الخاص بها
-        updatedUserData.profilePicture = uploadResult.secure_url;
-        updatedUserData.profilePicturePublicId = uploadResult.public_id;
-      }
-  
-      // 4. التحقق من كلمة المرور الجديدة إذا تم إرسالها
-      if (req.body.password && req.body.password.trim() !== "") {
-        const password = req.body.password.trim();
-  
-        // تحقق من قوة كلمة المرور
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
-        if (!passwordRegex.test(password)) {
-          req.flash(
-            "error",
-            "Password must be at least 8 characters with 1 upper case letter, 1 number, and 1 special character."
-          );
-          return res.redirect("/student/profile/edit");
-        }
-  
-        // تشفير كلمة المرور الجديدة
-        updatedUserData.password = await bcrypt.hash(password, 10);
-      } else {
-        // إذا لم يتم إرسال كلمة مرور جديدة، نحتفظ بالقديمة
-        updatedUserData.password = user.password;
-      }
-  
-      // 5. تحديث بيانات المستخدم (User)
-      const updatedUser = await User.findByIdAndUpdate(
-        req.user._id,
-        updatedUserData,
-        { new: true } // استرجاع البيانات المحدثة
-      ).select("name email profilePicture");
-
-      // 6. تحديث بيانات المعلم (Teacher) أو الحفاظ على القيم القديمة
-      const updatedTeacher = await Teachers.findOneAndUpdate(
-        { user: req.user._id },
-        {
-          phone: req.body.phone ?? teacher.phone,
-          address: req.body.address ?? teacher.address,
-        },
-        { new: true } // استرجاع البيانات المحدثة
-      ).select("phone address");
-  
-      // 7. رسالة نجاح وإعادة التوجيه إلى صفحة البروفايل
-      req.flash("success", "Profile updated successfully");
-      res.redirect("/teacher/profile");
-
+    const user = await User.findById(req.user._id).select("name email profilePicture profilePicturePublicId password");
+    const teacher = await Teachers.findOne({ user: req.user._id });
+ 
+    if (!user) {
+      req.flash('error', 'User not found');
+      return res.redirect('/login');
     }
-    catch (err) {
-      console.log(err);
-      return res.status(500).json({ message: "Internal server error" });
+
+    if (!teacher) {
+      req.flash('error', 'Teacher profile not found');
+      return res.redirect('/student/profile/edit');
     }
+
+    const updatedUserData = {
+      name: req.body.name ?? user.name,
+      email: req.body.email ?? user.email,
+      profilePicture: user.profilePicture, 
+      profilePicturePublicId: user.profilePicturePublicId, // حافظ عليه أيضاً
+    };
+
+    if (req.file) {
+      // حذف الصورة القديمة باستخدام public_id الصحيح
+      if (user.profilePicturePublicId) {
+        try {
+          await cloudinary.uploader.destroy(user.profilePicturePublicId);
+        } catch (err) {
+          console.error("Error deleting old image from Cloudinary:", err);
+        }
+      }
+
+      // رفع الصورة الجديدة
+      const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+        folder: "LMS/courses",
+        use_filename: true,
+        unique_filename: false,
+      });
+
+      updatedUserData.profilePicture = uploadResult.secure_url;
+      updatedUserData.profilePicturePublicId = uploadResult.public_id;
+    }
+
+    if (req.body.password && req.body.password.trim() !== "") {
+      const password = req.body.password.trim();
+
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
+      if (!passwordRegex.test(password)) {
+        req.flash(
+          "error",
+          "Password must be at least 8 characters with 1 upper case letter, 1 number, and 1 special character."
+        );
+        return res.redirect("/student/profile/edit");
+      }
+
+      updatedUserData.password = await bcrypt.hash(password, 10);
+    } else {
+      updatedUserData.password = user.password;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      updatedUserData,
+      { new: true }
+    ).select("name email profilePicture");
+
+    const updatedTeacher = await Teachers.findOneAndUpdate(
+      { user: req.user._id },
+      {
+        phone: req.body.phone ?? teacher.phone,
+        address: req.body.address ?? teacher.address,
+      },
+      { new: true }
+    ).select("phone address");
+
+    req.flash("success", "Profile updated successfully");
+    res.redirect("/teacher/profile");
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Internal server error" });
   }
+};
+
   
 
 teacher_addTask_post = async (req, res) => {

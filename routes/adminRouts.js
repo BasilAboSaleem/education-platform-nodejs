@@ -74,5 +74,6 @@ router.put("/admin/settings", requireAuth, isAdmin, adminController.admin_settin
 router.post("/admin/addTask", requireAuth, isAdmin, adminController.admin_addTask_post);
 router.delete("/admin/deleteTask/:id", requireAuth, isAdmin, adminController.admin_deleteTask_delete);
 router.put("/admin/tasks/:id/update-status", requireAuth, isAdmin, adminController.admin_updateTaskStatus_put);
+router.delete("/admin/delete-userUnverified/:id", requireAuth, isAdmin, adminController.admin_delete_userUnverified_delete);
 
 module.exports = router;

@@ -1755,10 +1755,37 @@ admin_updateTaskStatus_put = async (req, res) => {
   }
 }
   
-     
+admin_delete_userUnverified_delete = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // تأكد أن المستخدم غير موثّق قبل الحذف
+    const user = await User.findById(userId);
+    if (!user) {
+      req.flash("error", "User not found");
+      return res.redirect("/dashboard");
+    }
+
+    if (user.isVerified) {
+      req.flash("error", "You cannot delete a verified user");
+      return res.redirect("/dashboard");
+    }
+
+    // حذف المستخدم والكيانات المرتبطة
+    await User.findByIdAndDelete(userId);
+    await Teachers.findOneAndDelete({ user: userId });
+    await Student.findOneAndDelete({ user: userId });
+
+    req.flash("success", "Unverified user deleted successfully");
+    res.redirect("/dashboard");
+  } catch (err) {
+    console.error("Error deleting unverified user:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
 module.exports = {
-
-
     admin_students_get,
     admin_students_view_get,
     admin_students_edit_get,
@@ -1820,4 +1847,5 @@ module.exports = {
     admin_addTask_post,
     admin_deleteTask_delete,
     admin_updateTaskStatus_put,
+    admin_delete_userUnverified_delete
    }

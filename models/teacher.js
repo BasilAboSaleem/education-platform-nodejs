@@ -15,8 +15,8 @@ const teacherSchema = new mongoose.Schema({
     },
     status: {
       type: String,
-      enum: ['Active', 'Pending', 'Inactive'],
-      default: 'Pending',
+      enum: ['Unverified','Active', 'Pending', 'Inactive'],
+      default: 'Unverified',
     },
     courses: [{
       type: mongoose.Schema.Types.ObjectId,

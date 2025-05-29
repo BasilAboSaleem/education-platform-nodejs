@@ -118,6 +118,19 @@ verify_post = async (req, res) => {
       user.otpExpires = null;
       await user.save();
 
+        // تحديث حالة المعلم او الطالب المرتبط عند تحقق البريد
+  if(user.role === "Teacher") {
+    await Teacher.findOneAndUpdate(
+      { user: user._id },
+      { status: 'Pending' }
+    );
+  } else if(user.role === "Student") {
+    await Student.findOneAndUpdate(
+      { user: user._id },
+      { status: 'Active' }
+    );
+  }
+
       req.session.userId = null;
       req.session.otpAttempts = 0;
       req.session.otpBlockedUntil = null;
@@ -142,11 +155,20 @@ resend_verify_post = async (req, res) => {
     return res.redirect("/login");
   }
 
+  // تحقق من وقت الإرسال السابق لتقييد التكرار
+  if (req.session.lastOtpSent && Date.now() - req.session.lastOtpSent < 60 * 1000) {
+    return res.json({ success: false, message: 'Please wait before requesting a new code.' });
+  }
+
   try {
     const user = await User.findById(req.session.userId);
 
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (user.isVerified) {
+      return res.json({ success: false, message: 'User is already verified.' });
     }
 
     // توليد رمز تحقق جديد
@@ -156,6 +178,8 @@ resend_verify_post = async (req, res) => {
     user.otp = otp;
     user.otpExpires = otpExpires;
     await user.save();
+
+    req.session.lastOtpSent = Date.now();
 
     // إرسال رمز التحقق الجديد عبر البريد الإلكتروني
     const transporter = nodemailer.createTransport({
@@ -186,6 +210,7 @@ resend_verify_post = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 }
+
 login_get = (req, res) => {
     res.render("pages/auth/login")
 }
