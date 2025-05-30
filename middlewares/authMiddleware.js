@@ -1,6 +1,8 @@
 var jwt = require("jsonwebtoken");
 const UserModel = require("../models/user")
 const Notification = require("../models/notification")
+const rateLimit = require("express-rate-limit");
+
 
 //دالة لفحص تسجيل الدخول قبل السماج للمستخدم بالذهاب للراوت المطلوب
 const requireAuth = (req,res,next) => {
@@ -89,7 +91,16 @@ const isStudent = (req, res, next) => {
     }
 }
 
-
+// استيراد مكتبة rate-limit الخاصة بتقييد محاولات تسجيل الدخول
+const loginLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 دقائق
+  max: 5, // يسمح بـ 5 محاولات فقط خلال 10 دقائق من نفس الـ IP
+  message: {
+    error: "Too many login attempts. Please try again after 10 minutes."
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 
 
@@ -102,4 +113,5 @@ module.exports = {
     isAdmin,
     isTeacher,
     isStudent,
+    loginLimiter
 }

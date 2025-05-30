@@ -19,7 +19,15 @@ const userSchema = new mongoose.Schema({
      },
   otp: String,
   otpExpires: Date,
-}, { timestamps: true });
+  //حقول اعادة تعيين كلمة مروور
+  resetPasswordToken: {
+    type: String
+  },
+  resetPasswordExpires: {
+    type: Date
+  }
+},
+{ timestamps: true });
 
 // تشفير كلمة المرور قبل الحفظ
 userSchema.pre('save', async function(next) {
