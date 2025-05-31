@@ -967,7 +967,7 @@ teacher_notifications_get = async (req, res) => {
 teacher_profile_get = async (req, res) => {
   try{
     const user = await User.findById(req.user._id).select("name email profilePicture createdAt")
-    const teacher = await Teachers.findOne({ user: req.user._id }).select("address phone")
+    const teacher = await Teachers.findOne({ user: req.user._id }).select("address phone status social expertise bio")
     res.render("pages/teacher/profile/my-profile" , { user , teacher, moment})
 
   }
@@ -979,7 +979,7 @@ teacher_profile_get = async (req, res) => {
 teacher_profile_edit_get = async (req, res) => {
   try{
     const user = await User.findById(req.user._id).select("name email profilePicture ")
-    const teacher = await Teachers.findOne({ user: req.user._id }).select("address phone")
+    const teacher = await Teachers.findOne({ user: req.user._id }).select("address phone status social expertise bio specialization")
     res.render("pages/teacher/profile/edit-profile" , { user , teacher})
 
   }
@@ -1001,7 +1001,7 @@ teacher_profile_edit_put = async (req, res) => {
 
     if (!teacher) {
       req.flash('error', 'Teacher profile not found');
-      return res.redirect('/student/profile/edit');
+      return res.redirect('/teacher/profile/edit');
     }
 
     const updatedUserData = {
@@ -1009,6 +1009,7 @@ teacher_profile_edit_put = async (req, res) => {
       email: req.body.email ?? user.email,
       profilePicture: user.profilePicture, 
       profilePicturePublicId: user.profilePicturePublicId, // حافظ عليه أيضاً
+      
     };
 
     if (req.file) {
@@ -1041,25 +1042,33 @@ teacher_profile_edit_put = async (req, res) => {
           "error",
           "Password must be at least 8 characters with 1 upper case letter, 1 number, and 1 special character."
         );
-        return res.redirect("/student/profile/edit");
+        return res.redirect("/teacher/profile/edit");
       }
 
-      updatedUserData.password = await bcrypt.hash(password, 10);
+      updatedUserData.password = password; //سيتم تشفير الكلمة في المودل
     } else {
       updatedUserData.password = user.password;
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      updatedUserData,
-      { new: true }
-    ).select("name email profilePicture");
+  //تحديث بيانات اليوزر مع تشفير كلمة المرور في المودل 
+  Object.assign(user, updatedUserData);
+await user.save();
 
     const updatedTeacher = await Teachers.findOneAndUpdate(
       { user: req.user._id },
       {
         phone: req.body.phone ?? teacher.phone,
         address: req.body.address ?? teacher.address,
+        bio: req.body.bio ?? teacher.bio,
+        specialization: req.body.specialization ?? teacher.specialization,
+        expertise: req.body.expertise ?? teacher.expertise,
+        social: {
+          facebook: req.body.facebook ?? teacher.social.facebook,
+          twitter: req.body.twitter ?? teacher.social.twitter,
+          linkedin: req.body.linkedin ?? teacher.social.linkedin,
+          instagram: req.body.instagram ?? teacher.social.instagram,
+        },
+
       },
       { new: true }
     ).select("phone address");

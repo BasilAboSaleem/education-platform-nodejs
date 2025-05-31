@@ -39,7 +39,8 @@ const settingSchema = new mongoose.Schema({
       type: Date
     },
     link: {
-      type: String
+      type: String,
+      default: '/register'
     }
   }
 },
@@ -90,7 +91,7 @@ socialLinks: {
   instagram: { type: String, default: 'https://instagram.com/yourpage' },
   linkedin: { type: String, default: 'https://linkedin.com/in/yourpage' }
 },
-// حخليه ستاتيك حاليا
+
   footerText: {
     type: String,
     default: '© 2025 Learnova Platform. All rights reserved.'

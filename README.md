@@ -141,3 +141,7 @@ A full-featured educational platform for displaying and selling courses. The sys
 ---
 
 Feel free to fork, contribute, or suggest improvements!
+
+## 🌍 Developer Context (Optional Personal Note)
+
+This platform was fully developed under extremely difficult conditions during the war in Gaza, amid displacement, power outages, and severe resource limitations. Despite these challenges, I committed to learning and building a real-world full-stack project to demonstrate my skills and perseverance.

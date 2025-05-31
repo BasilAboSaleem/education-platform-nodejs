@@ -86,10 +86,11 @@ mongoose
     next();
 });
 // Middleware to load logo from settings
+const Setting = require('./models/setting'); // Assuming you have a Setting model defined
 app.use(async (req, res, next) => {
   try {
     const settings = await Setting.findOne({});
-    res.locals.logo = settings?.logo || 'default-logo.png';
+    res.locals.logo = settings?.siteLogo || 'default-logo.png';
   } catch (err) {
     res.locals.logo = 'default-logo.png';
   }

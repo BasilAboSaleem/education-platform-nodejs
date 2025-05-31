@@ -1660,14 +1660,14 @@ admin_settings_put = async (req, res) => {
  
     
     // contactSection
-    settings.contactSection.title = body.contactTitle || settings.contactSection.title;
-    settings.contactSection.heading = body.contactHeading || settings.contactSection.heading;
-    settings.contactSection.description = body.contactDescription || settings.contactSection.description;
-    settings.contactSection.specialOffer.text = body.offerText || settings.contactSection.specialOffer.text;
-    settings.contactSection.specialOffer.offerAmount = body.offerAmount || settings.contactSection.specialOffer.offerAmount;
-    settings.contactSection.specialOffer.validUntil = body.offerValidUntil || settings.contactSection.specialOffer.validUntil;
-    settings.contactSection.specialOffer.link = body.offerLink || settings.contactSection.specialOffer.link;
-    
+settings.contactSection.title = body.contactSection?.title || settings.contactSection.title;
+settings.contactSection.heading = body.contactSection?.heading || settings.contactSection.heading;
+settings.contactSection.description = body.contactSection?.description || settings.contactSection.description;
+
+settings.contactSection.specialOffer.text = body.contactSection?.specialOffer?.text || settings.contactSection.specialOffer.text;
+settings.contactSection.specialOffer.offerAmount = body.contactSection?.specialOffer?.offerAmount || settings.contactSection.specialOffer.offerAmount;
+settings.contactSection.specialOffer.validUntil = body.contactSection?.specialOffer?.validUntil || settings.contactSection.specialOffer.validUntil;
+settings.contactSection.specialOffer.link = body.contactSection?.specialOffer?.link || settings.contactSection.specialOffer.link;
     // footer
     settings.footerText = body.footerText || settings.footerText;
 

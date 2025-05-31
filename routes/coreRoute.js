@@ -5,7 +5,7 @@ const {requireAuth} = require("../middlewares/authMiddleware")
 const { check } = require("express-validator");
 
 router.get("/", coreController.index_get );
-
+router.post("/contact", coreController.contact_post);
 router.get("/dashboard", requireAuth, coreController.dashboard_get );
 
 module.exports = router;

@@ -105,6 +105,47 @@
           <div class="col-sm-4 text-secondary fw-semibold">Phone:</div>
           <div class="col-sm-8"><%= teacher.phone ? teacher.phone : 'Not provided' %></div>
         </div>
+        <% if (teacher.bio) { %>
+  <div class="row mb-2">
+    <div class="col-sm-4 text-secondary fw-semibold">Bio:</div>
+    <div class="col-sm-8"><%= teacher.bio %></div>
+  </div>
+<% } %>
+
+  <div class="row mb-2">
+    <div class="col-sm-4 text-secondary fw-semibold">Specialization:</div>
+    <div class="col-sm-8"><%= teacher.specialization %></div>
+  </div>
+
+<% if (teacher.expertise && teacher.expertise.length > 0) { %>
+  <div class="row mb-2">
+    <div class="col-sm-4 text-secondary fw-semibold">Expertise:</div>
+    <div class="col-sm-8">
+      <%= teacher.expertise.join(', ') %>
+    </div>
+  </div>
+<% } %>
+
+<div class="row mb-2">
+  <div class="col-sm-4 text-secondary fw-semibold">Status:</div>
+  <div class="col-sm-8"><%= teacher.status %></div>
+</div>
+
+<% if (teacher.social) { %>
+  <div class="row mb-2">
+    <div class="col-sm-4 text-secondary fw-semibold">Twitter:</div>
+    <div class="col-sm-8"><%= teacher.social.twitter || 'Not provided' %></div>
+  </div>
+  <div class="row mb-2">
+    <div class="col-sm-4 text-secondary fw-semibold">LinkedIn:</div>
+    <div class="col-sm-8"><%= teacher.social.linkedin || 'Not provided' %></div>
+  </div>
+  <div class="row mb-2">
+    <div class="col-sm-4 text-secondary fw-semibold">Facebook:</div>
+    <div class="col-sm-8"><%= teacher.social.facebook || 'Not provided' %></div>
+  </div>
+<% } %>
+
 
         <p class="text-muted mb-2"><i class="mdi mdi-account-outline"></i> Teacher </p>
         <p class="text-muted mb-2"><i class="mdi mdi-calendar"></i> Joined on <%= new Date(user.createdAt).toLocaleDateString() %></p>

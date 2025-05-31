@@ -267,26 +267,42 @@
 
 
       <!-- Contact Section -->
-      <div class="section-title">Contact Section</div>
-      <div class="form-group">
-        <label for="contactTitle">Contact Title</label>
-        <input type="text" id="contactTitle" name="contactTitle" value="<%= settings.contactTitle %>" />
-      </div>
+<div class="section-title">Contact Section</div>
 
-      <div class="form-group">
-        <label for="contactPhone">Contact Phone</label>
-        <input type="text" id="contactPhone" name="contactPhone" value="<%= settings.contactPhone %>" />
-      </div>
+<div class="form-group">
+  <label for="contactTitle">Contact Title</label>
+  <input type="text" id="contactTitle" name="contactSection[title]" value="<%= settings.contactSection.title %>" />
+</div>
 
-      <div class="form-group">
-        <label for="contactEmail">Contact Email</label>
-        <input type="email" id="contactEmail" name="contactEmail" value="<%= settings.contactEmail %>" />
-      </div>
+<div class="form-group">
+  <label for="contactHeading">Contact Heading</label>
+  <input type="text" id="contactHeading" name="contactSection[heading]" value="<%= settings.contactSection.heading %>" />
+</div>
 
-      <div class="form-group">
-        <label for="contactAddress">Contact Address</label>
-        <textarea id="contactAddress" name="contactAddress" rows="3"><%= settings.contactAddress %></textarea>
-      </div>
+<div class="form-group">
+  <label for="contactDescription">Contact Description</label>
+  <textarea id="contactDescription" name="contactSection[description]" rows="3"><%= settings.contactSection.description %></textarea>
+</div>
+
+<hr>
+
+<div class="section-title">Special Offer</div>
+
+<div class="form-group">
+  <label for="specialOfferText">Offer Text</label>
+  <input type="text" id="specialOfferText" name="contactSection[specialOffer][text]" value="<%= settings.contactSection.specialOffer.text %>" />
+</div>
+
+<div class="form-group">
+  <label for="specialOfferAmount">Offer Amount</label>
+  <input type="text" id="specialOfferAmount" name="contactSection[specialOffer][offerAmount]" value="<%= settings.contactSection.specialOffer.offerAmount %>" />
+</div>
+
+<div class="form-group">
+  <label for="specialOfferValidUntil">Valid Until</label>
+  <input type="date" id="specialOfferValidUntil" name="contactSection[specialOffer][validUntil]" 
+         value="<%= settings.contactSection.specialOffer.validUntil ? settings.contactSection.specialOffer.validUntil.toISOString().slice(0,10) : '' %>" />
+</div>
 
 <!-- About Section -->
 <div class="section-title">About Section</div>
@@ -310,7 +326,13 @@
   <label for="aboutButtonText">Button Text</label>
   <input type="text" id="aboutButtonText" name="aboutSection[buttonText]" value="<%= settings.aboutSection.buttonText %>" />
 </div>
+<!-- Footer Settings -->
+<div class="section-title">Footer Settings</div>
 
+<div class="form-group">
+  <label for="footerText">Footer Text</label>
+  <textarea id="footerText" name="footerText" rows="2" placeholder="Enter footer text"><%= settings.footerText || '' %></textarea>
+</div>
 <button type="submit" class="btn btn-primary">Save Settings</button>
 </form>
 </div>

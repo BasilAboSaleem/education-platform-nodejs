@@ -1,107 +1,75 @@
+<style>
+  .fixed-thumb {
+    height: 220px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+  }
 
-<section class="section courses" id="courses" >
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12 text-center">
-          <div class="section-heading">
-            <h6>Latest Courses</h6>
-            <h2>Latest Courses</h2>
-          </div>
-        </div>
-      </div>
-      <ul class="event_filter">
-        <li>
-          <a class="is_active" href="#!" data-filter="*">Show All</a>
-        </li>
-        <li>
-          <a href="#!" data-filter=".design">Webdesign</a>
-        </li>
-        <li>
-          <a href="#!" data-filter=".development">Development</a>
-        </li>
-        <li>
-          <a href="#!" data-filter=".wordpress">Wordpress</a>
-        </li>
-      </ul>
-      <div class="row event_box">
-        <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 design">
-          <div class="events_item">
-            <div class="thumb">
-              <a href="#"><img src="assets/images/course-01.jpg" alt=""></a>
-              <span class="category">Webdesign</span>
-              <span class="price"><h6><em>$</em>160</h6></span>
-            </div>
-            <div class="down-content">
-              <span class="author">Stella Blair</span>
-              <h4>Learn Web Design</h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6  development">
-          <div class="events_item">
-            <div class="thumb">
-              <a href="#"><img src="assets/images/course-02.jpg" alt=""></a>
-              <span class="category">Development</span>
-              <span class="price"><h6><em>$</em>340</h6></span>
-            </div>
-            <div class="down-content">
-              <span class="author">Cindy Walker</span>
-              <h4>Web Development Tips</h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 design wordpress">
-          <div class="events_item">
-            <div class="thumb">
-              <a href="#"><img src="assets/images/course-03.jpg" alt=""></a>
-              <span class="category">Wordpress</span>
-              <span class="price"><h6><em>$</em>640</h6></span>
-            </div>
-            <div class="down-content">
-              <span class="author">David Hutson</span>
-              <h4>Latest Web Trends</h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 development">
-          <div class="events_item">
-            <div class="thumb">
-              <a href="#"><img src="assets/images/course-04.jpg" alt=""></a>
-              <span class="category">Development</span>
-              <span class="price"><h6><em>$</em>450</h6></span>
-            </div>
-            <div class="down-content">
-              <span class="author">Stella Blair</span>
-              <h4>Online Learning Steps</h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 wordpress development">
-          <div class="events_item">
-            <div class="thumb">
-              <a href="#"><img src="assets/images/course-05.jpg" alt=""></a>
-              <span class="category">Wordpress</span>
-              <span class="price"><h6><em>$</em>320</h6></span>
-            </div>
-            <div class="down-content">
-              <span class="author">Sophia Rose</span>
-              <h4>Be a WordPress Master</h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 wordpress design">
-          <div class="events_item">
-            <div class="thumb">
-              <a href="#"><img src="assets/images/course-06.jpg" alt=""></a>
-              <span class="category">Webdesign</span>
-              <span class="price"><h6><em>$</em>240</h6></span>
-            </div>
-            <div class="down-content">
-              <span class="author">David Hutson</span>
-              <h4>Full Stack Developer</h4>
-            </div>
-          </div>
+  .fixed-thumb img {
+    height: 100%;
+    width: auto;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .fixed-thumb img:hover {
+    transform: scale(1.05);
+  }
+
+  .down-content h4 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 10px;
+    color: #2a2a2a;
+  }
+
+  .down-content .author {
+    color: #aaa;
+    font-size: 14px;
+  }
+</style>
+
+<section class="section courses" id="courses">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <div class="section-heading">
+          <h6>Latest Courses</h6>
+          <h2>Latest Courses</h2>
         </div>
       </div>
     </div>
-  </section>
+
+    <ul class="event_filter">
+      <li><a class="is_active" href="#!" data-filter="*">Show All</a></li>
+      <li><a href="#!" data-filter=".design">Webdesign</a></li>
+      <li><a href="#!" data-filter=".development">Development</a></li>
+      <li><a href="#!" data-filter=".wordpress">Wordpress</a></li>
+    </ul>
+
+    <div class="row event_box">
+      <% courses.forEach(course => { %>
+        <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer <%= course.category.name %>">
+          <div class="events_item">
+            <div class="thumb fixed-thumb">
+              <a href="#"><img src="<%= course.image %>" alt=""></a>
+              <span class="category"><%= course.category.name %></span>
+              <span class="price"><h6><em>$</em><%= course.price %></h6></span>
+            </div>
+            <div class="down-content">
+              <span class="author"><%= course.teacher?.user?.name || "Unknown Teacher" %></span>
+              <h4><%= course.title %></h4>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="/register" class="main-button">Discover More</a>
+    </div>
+  </div>
+</section>

@@ -10,6 +10,10 @@ const teacherSchema = new mongoose.Schema({
       type: String,
       maxlength: 1000,
     },
+     specialization: {
+      type: String, 
+      default: "",  
+    },
     expertise: {
       type: [String], // مثلا ["Web Development", "Design", "Marketing"]
     },
@@ -24,6 +28,12 @@ const teacherSchema = new mongoose.Schema({
     }],
     phone: String,
     address: String,
+    social: {
+      twitter: { type: String, default: "" },
+      linkedin: { type: String, default: "" },
+      facebook: { type: String, default: "" }
+  }
+
   }, { timestamps: true });
   
   
