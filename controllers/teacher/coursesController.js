@@ -11,7 +11,7 @@ teacher_addCourse_get = async (req, res) => {
             return res.redirect("/dashboard");
         }
         const categories = await Category.find({ status: "Active"});
-        res.render("pages/teacher/add-course", { categories: categories });
+        res.render("pages/teacher/courses/add-course", { categories: categories });
 
 
     }
@@ -88,9 +88,9 @@ teacher_courses_get = async (req, res) => {
     try{
         const teacher = await Teachers.findOne({user: req.user._id});
         const courses = await Course.find({ teacher: teacher._id }).populate("category").populate("teacher");
-        
-        res.render("pages/teacher/courses", { courses: courses });
-       
+
+        res.render("pages/teacher/courses/courses", { courses: courses });
+
     }catch(err){
         console.log(err);
     }
@@ -104,8 +104,8 @@ teacher_course_view_get = async (req, res) => {
               model: 'User'
             }
           }).populate("category");
-     
-        res.render("pages/teacher/course_view", { course: course , moment: moment });
+
+        res.render("pages/teacher/courses/course_view", { course: course , moment: moment });
 
     }
     catch(err){
@@ -116,7 +116,7 @@ teacher_course_edit_get = async (req, res) => {
     try{
         const course = await Course.findById(req.params.id).populate("category").populate("teacher");
         const categories = await Category.find({status: "Active"});
-        res.render("pages/teacher/courses_edit", { course: course , moment: moment, categories: categories });
+        res.render("pages/teacher/courses/courses_edit", { course: course , moment: moment, categories: categories });
 
     }
     catch(err){
@@ -174,23 +174,37 @@ teacher_course_edit_put = async (req, res) => {
 
   
 teacher_course_delete = async (req, res) => {
-    try{
-        const course = await Course.findByIdAndDelete(req.params.id);
+    try {
+        // ابحث عن الكورس أولاً
+        const course = await Course.findById(req.params.id);
         if (!course) {
             req.flash("error", "Course not found.");
             return res.redirect("/teacher/courses");
         }
-        // Remove the course ID from the teacher's courses array
+
+        // احذف الصورة من Cloudinary قبل حذف الكورس
+        const imagePublicId = course.image.split('/').pop().split('.')[0];
+        await cloudinary.uploader.destroy(`LMS/courses/${imagePublicId}`);
+
+        // احذف الدروس والتسجيلات المرتبطة
+        await Lesson.deleteMany({ course: course._id });
+        await Enrollment.deleteMany({ course: course._id });
+
+        // احذف الكورس نفسه
+        await Course.findByIdAndDelete(course._id);
+
+        // احذف ID الكورس من teacher
         await Teachers.findByIdAndUpdate(course.teacher, { $pull: { courses: course._id } });
-        
+
         req.flash("success", "Course deleted successfully.");
         res.redirect("/teacher/courses");
-
-    }
-    catch(err){
+    } catch (err) {
         console.log(err);
+        req.flash("error", "Something went wrong.");
+        res.redirect("/teacher/courses");
     }
 }
+
 teacher_course_status_put = async (req, res) => {
     try{
         const course = await Course.findById(req.params.id)

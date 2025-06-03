@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Teacher Dashboard - Add Course</title>
+        <title>Teacher Dashboard - Add Lesson</title>
         <link rel="stylesheet" href="/assets/vendors/feather/feather.css">
         <link rel="stylesheet" href="/assets/vendors/mdi/css/materialdesignicons.min.css">
         <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
@@ -17,11 +17,11 @@
   <body class="with-welcome-text">
     <div class="container-scroller">
       <!-- partials/starAdminpartials/_navbar.ejs -->
-     <%- include('../../partials/starAdminpartials/_navbar.ejs') %>
+     <%- include('../../../partials/starAdminpartials/_navbar.ejs') %>
       <!-- partial -->
       <div class="container-fluid page-body-wrapper">
         <!-- partials/starAdminpartials/_sidebar.ejs -->
-        <%- include('../../partials/starAdminpartials/_sidebar.ejs') %>
+        <%- include('../../../partials/starAdminpartials/sidebarLessons.ejs') %>
         <!-- Content -->
         <div class="col-12 d-flex justify-content-center">
           <div class="card" style="width: 60%; margin-right: 200px;">
@@ -38,45 +38,28 @@
             </div>
           <% } %>
             <div class="card-body">
-                <h4 class="card-title">Add Course form</h4>
-                <p class="card-description"> Add Course form </p>
-                <form class="forms-sample" action="/teacher/add-course" method="POST" enctype="multipart/form-data">
+                <h4 class="card-title">Add Lesson for <%= course.title %> course</h4>
+                <p class="card-description"> Add Lesson form </p>
+                <form class="forms-sample" action="/teacher/courses/<%= course._id %>/addLesson" method="POST">
                   <div class="form-group">
-                    <label for="exampleInputName1">Course Title</label>
+                    <label for="exampleInputName1">Lesson Title</label>
                     <input type="text" class="form-control" id="exampleInputName1" placeholder="Name" name="title" required>
                   </div>
                   <div class="form-group">
-                    <label for="exampleInputEmail3">Course Description</label>
-                    <input type="text" class="form-control" id="exampleInputEmail3" placeholder="Description" name="description" required>
+                    <label for="exampleInputEmail3">Lesson Content</label>
+                    <input type="text" class="form-control" id="exampleInputEmail3" placeholder="Description" name="content" required>
                   </div>
                   <div class="form-group">
-                    <label for="exampleInputPassword4">Course Price ($)</label>
-                    <input type="number" class="form-control" id="exampleInputPassword4" placeholder="Price" name="price" required>
+                    <label for="exampleInputPassword4">Lesson Order</label>
+                    <input type="number" class="form-control" id="exampleInputPassword4" placeholder="Order" name="order" required>
                   </div>
                   <div class="form-group">
-                    <label  for="exampleSelectGender">category</label>
-                    <select class="form-control text-dark bg-white" name="category" id="category" required>
-                      <option disabled selected>Select categorie </option>
-                      <% categories.forEach(cat => { %>
-                        <option value="<%= cat._id %>"><%= cat.name %></option>
-                      <% }) %>
-                    </select>
-                    
+                    <label for="exampleInputEmail3">Video Url</label>
+                    <input type="text" class="form-control" id="exampleInputEmail3" placeholder="Video URL" name="videoUrl">
                   </div>
-                  <div class="form-group">
-                    <label>File upload</label>
-                    <input type="file" name="image" class="file-upload-default">
-                    <div class="input-group col-xs-12">
-                      <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image" >
-                      <span class="input-group-append">
-                        <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
-                      </span>
-                    </div>
-                  </div>
-                 
               
-                  <button type="submit" class="btn btn-primary me-2">Add Course</button>
-                  <a href="/dashboard" class="btn btn-light">Cancel</a>
+                  <button type="submit" class="btn btn-primary me-2">Add Lesson</button>
+                  <a href="/teacher/courses/<%= course._id %>/lessons" class="btn btn-light">Cancel</a>
                 </form>
               </div>
             </div>

@@ -20,7 +20,7 @@ student_allCourses_get = async (req, res) => {
         },
       })
       .populate("lessons");
-    res.render("pages/student/all-courses", { courses: courses, categories });
+    res.render("pages/student/coursess/all-courses", { courses: courses, categories });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Internal server error" });
@@ -43,7 +43,7 @@ student_allCourses_free_get = async (req, res) => {
         },
       })
       .populate("lessons");
-    res.render("pages/student/all-courses", { courses: courses, categories });
+    res.render("pages/student/coursess/all-courses", { courses: courses, categories });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Internal server error" });
@@ -72,7 +72,7 @@ student_allCourses_category_get = async (req, res) => {
       .populate("lessons");
 
     // تمرير الكورسات والفئات إلى الواجهة
-    res.render("pages/student/all-courses", { courses: courses, categories });
+    res.render("pages/student/coursess/all-courses", { courses: courses, categories });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Internal server error" });
@@ -94,7 +94,7 @@ student_allCourses_courseDetails_get = async (req, res) => {
         },
       })
       .populate("lessons");
-    res.render("pages/student/course-detail", { course });
+    res.render("pages/student/coursess/course-detail", { course });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Internal server error" });
@@ -182,7 +182,7 @@ student_myCourses_get = async (req, res) => {
           },
         },
       });
-    res.render("pages/student/my-courses", { enrollments });
+    res.render("pages/student/coursess/my-courses", { enrollments });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Internal server error" });
@@ -260,7 +260,7 @@ student_myCourses_courseDetails_get = async (req, res) => {
       progressPercent = Math.round((watchedCount / totalLessons) * 100);
     }
     
-    res.render("pages/student/my-courseDetails", {
+    res.render("pages/student/coursess/my-courseDetails", {
       enrollment,
       startLessonId,
       progressPercent,

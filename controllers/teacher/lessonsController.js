@@ -13,8 +13,8 @@ teacher_course_lessons_get = async (req, res) => {
             return res.redirect(`/teacher/courses/view/${req.params.id}`);
         }
         const lessons = await Lesson.find({course: req.params.id}).populate("course");
-        
-        res.render("pages/teacher/course-lesoons", { course: course , moment: moment, lessons: lessons });
+
+        res.render("pages/teacher/lessons/course-lessons", { course: course , moment: moment, lessons: lessons });
 
     }
     catch(err){
@@ -25,7 +25,7 @@ teacher_course_lessons_get = async (req, res) => {
 teacher_course_add_lesson_get = async (req, res) => {
     try{
         const course = await Course.findById(req.params.id);
-        res.render("pages/teacher/add-lesson", { course: course });
+        res.render("pages/teacher/lessons/add-lesson", { course: course });
 
     }
     catch(err){
@@ -61,7 +61,7 @@ teacher_course_add_lesson_post = async (req, res) => {
 teacher_course_lesson_view_get = async (req, res) => {
     try{
         const lesson = await Lesson.findById(req.params.id).populate("course");
-        res.render("pages/teacher/lesson_view", { lesson: lesson , moment: moment, course: lesson.course });
+        res.render("pages/teacher/lessons/lesson_view", { lesson: lesson , moment: moment, course: lesson.course });
 
     }
     catch(err){
@@ -72,7 +72,7 @@ teacher_course_lesson_view_get = async (req, res) => {
 teacher_course_lesson_edit_get = async (req, res) => {
     try{
         const lesson = await Lesson.findById(req.params.id).populate("course");
-        res.render("pages/teacher/edit_lesson", { lesson: lesson , moment: moment, course: lesson.course });
+        res.render("pages/teacher/lessons/edit_lesson", { lesson: lesson , moment: moment, course: lesson.course });
 
     }
     catch(err){

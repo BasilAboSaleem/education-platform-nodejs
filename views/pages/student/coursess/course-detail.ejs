@@ -4,8 +4,10 @@
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <title>Student Dashboard - My Courses</title>
+    <title>Student Dashboard - Courses Details</title>
     <link rel="stylesheet" href="/assets/vendors/feather/feather.css">
     <link rel="stylesheet" href="/assets/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
@@ -34,68 +36,92 @@ https://templatemo.com/tm-586-scholar
 <body class="with-welcome-text">
   <div >
     <!-- partials/starAdminpartials/_navbar.ejs -->
-   <%- include('../../partials/starAdminpartials/_navbar.ejs') %>
+   <%- include('../../../partials/starAdminpartials/_navbar.ejs') %>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partials/starAdminpartials/_sidebar.ejs -->
-      <%- include('../../partials/starAdminpartials/_sidebar.ejs') %>
+      <%- include('../../../partials/starAdminpartials/_sidebar.ejs') %>
       <!-- Content -->
       <div class="main-panel">
       <div class="content-wrapper px-3">
-        <% if (error && error.length > 0) { %>
-          <div class="alert alert-danger">
-            <%= error[0] %>
-          </div>
-        <% } %>
 
-        <% if (success && success.length > 0) { %>
-          <div class="alert alert-success">
-            <%= success[0] %>
-          </div>
-        <% } %>
+      <!-- course-details.ejs -->
 
-        <div class="search-container" style="display: flex; justify-content: flex-end;">
-          <form action="/admin/students/search" method="post" style="display: inline;">
-            <input type="text" name="query" placeholder="Search for a course" class="form-control" style="display: inline-block; width: auto;">
-            <button type="submit" class="btn btn-sm btn-primary">
-              <i class="mdi mdi-magnify"></i> Search
-            </button>
-          </form>
-        </div>
+<div class="container mt-5 course-details">
+    <!-- Header -->
+    <div class="course-header row">
+      <div class="col-md-6">
+        <img src="<%= course.image %>" alt="<%= course.title %>" class="course-banner img-fluid rounded">
+      </div>
+      <div class="col-md-6">
+        <h2 class="mb-3"><%= course.title %></h2>
+        <p><strong>Instructor:</strong> <%= course.teacher.user.name %></p>
+        <span class="badge bg-secondary"><%= course.category.name %></span>
+  
+        <p class="price mt-3">
+          <% if (course.price === 0) { %>
+            <span class="text-success h4">Free</span>
+          <% } else { %>
+            <span class="text-primary h4">$<%= course.price %></span>
+          <% } %>
+        </p>
+        <form action="/student/all-courses/course/<%= course._id %>/enroll" method="post">
+          <button type="submit" class="btn btn-primary mt-3">
+            <% if (course.price === 0) { %> Enroll Now <% } %>
+            <% if (course.price > 0) { %> Buy Now <% } %>
+
+             
+          </button>
+        </form>
+      
         
-        </div> <!-- padding من Bootstrap مباشرة -->
-        <section class="section courses" id="courses">
-          <div class="custom-courses-wrapper">
-    <% if (enrollments.length === 0) { %>
-     
-      <p>No courses available.</p>
-    <% } %>
-          
-    <div class="row event_box">
-      <% enrollments.forEach(enrollment => { %>
-        <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6">
-          <div class="events_item">
-            <div class="thumb">
-              <a href="/student/my-courses/courseDetails/<%= enrollment.course._id %>"><img src="<%= enrollment.course.image %>" alt="" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;"></a>
-              <span class="category"><%= enrollment.course.category.name %></span>
-              <% if (enrollment.course.price === 0) { %>
-                <span class="price"><h6>free</h6></span>
-              <% } else { %>
-                <span class="price"><h6><em>$</em><%= enrollment.course.price %></h6></span>
-              <% } %>
-            </div>
-            <div class="down-content">
-              <span class="author"><%= enrollment.course.teacher.user.name %></span>
-              <h4><%= enrollment.course.title %></h4>
-            </div>
-          </div>
-        </div>
-      <% }) %>
-     
+      </div>
     </div>
-  </div>
+  
+    <!-- Description -->
+    <div class="course-description mt-5">
+      <h4>Description</h4>
+      <p><%= course.description %></p>
+    </div>
+  
+    <!-- Lessons -->
+    <section class="course-content mt-5">
+        <h4 class="mb-4">Course Lessons</h4>
+        <ul class="list-group">
+            <% if (course.lessons.length === 0) { %>
+             
+              <li class="list-group-item">No lessons available for this course.</li>
+            <% } %>
+          <% course.lessons.forEach((lesson, index) => { %>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center">
+                <span class="badge bg-primary me-3"><%= index + 1 %></span>
+                <div>
+                  <strong><%= lesson.title %></strong>
+                  <% if (lesson.content) { %>
+                    <div class="text-muted small"><%= lesson.content %></div>
+                  <% } %>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <% if (lesson.order) { %>
+                  <span class="text-muted me-3"><i class="fas fa-clock me-1"></i><%= lesson.order %> min</span>
+                <% } %>
+                <% if (!lesson.videoUrl) { %>
+                  <span class="text-muted small">Coming soon</span>
 
-</section>
+                <% }  %>
+              
+              </div>
+            </li>
+          <% }) %>
+        </ul>
+      </section>
+      
+  </div>
+  
+
+
 </div>
 </div>
 
@@ -134,6 +160,21 @@ https://templatemo.com/tm-586-scholar
   border-radius: 10px;
 }
 
+.course-banner {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+}
+
+.course-description p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.price {
+  font-size: 22px;
+  font-weight: bold;
+}
 
 
 

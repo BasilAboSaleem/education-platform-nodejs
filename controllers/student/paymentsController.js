@@ -96,7 +96,7 @@ student_payments_get = async (req, res) => {
     });
       
 
-    res.render("pages/student/myPayments", { data });
+    res.render("pages/student/payments/myPayments", { data });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Internal server error" });

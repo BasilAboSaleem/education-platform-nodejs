@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <title>Student Dashboard - All Courses</title>
+    <title>Student Dashboard - My Courses</title>
     <link rel="stylesheet" href="/assets/vendors/feather/feather.css">
     <link rel="stylesheet" href="/assets/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
@@ -34,14 +34,25 @@ https://templatemo.com/tm-586-scholar
 <body class="with-welcome-text">
   <div >
     <!-- partials/starAdminpartials/_navbar.ejs -->
-   <%- include('../../partials/starAdminpartials/_navbar.ejs') %>
+   <%- include('../../../partials/starAdminpartials/_navbar.ejs') %>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partials/starAdminpartials/_sidebar.ejs -->
-      <%- include('../../partials/starAdminpartials/_sidebar.ejs') %>
+      <%- include('../../../partials/starAdminpartials/_sidebar.ejs') %>
       <!-- Content -->
       <div class="main-panel">
       <div class="content-wrapper px-3">
+        <% if (error && error.length > 0) { %>
+          <div class="alert alert-danger">
+            <%= error[0] %>
+          </div>
+        <% } %>
+
+        <% if (success && success.length > 0) { %>
+          <div class="alert alert-success">
+            <%= success[0] %>
+          </div>
+        <% } %>
 
         <div class="search-container" style="display: flex; justify-content: flex-end;">
           <form action="/admin/students/search" method="post" style="display: inline;">
@@ -50,33 +61,32 @@ https://templatemo.com/tm-586-scholar
               <i class="mdi mdi-magnify"></i> Search
             </button>
           </form>
+        </div>
+        
         </div> <!-- padding من Bootstrap مباشرة -->
         <section class="section courses" id="courses">
           <div class="custom-courses-wrapper">
-    
-            <ul class="event_filter category-scroll">
-              <li><a href="/student/all-courses" data-filter="*">Show All</a></li>
-              <li><a href="/student/all-courses/free" data-filter=".free">Free</a></li>
-              <% categories.forEach(category => { %>
-                <li><a href="/student/all-courses/category/<%= category._id %>" data-filter=".<%= category._id %>"><%= category.name %></a></li>
-              <% }) %>
-            </ul>
+    <% if (enrollments.length === 0) { %>
+     
+      <p>No courses available.</p>
+    <% } %>
+          
     <div class="row event_box">
-      <% courses.forEach(course => { %>
+      <% enrollments.forEach(enrollment => { %>
         <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6">
           <div class="events_item">
             <div class="thumb">
-              <a href="/student/all-courses/courseDetails/<%= course._id %>"><img src="<%= course.image %>" alt="" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;"></a>
-              <span class="category"><%= course.category.name %></span>
-              <% if (course.price === 0) { %>
+              <a href="/student/my-courses/courseDetails/<%= enrollment.course._id %>"><img src="<%= enrollment.course.image %>" alt="" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;"></a>
+              <span class="category"><%= enrollment.course.category.name %></span>
+              <% if (enrollment.course.price === 0) { %>
                 <span class="price"><h6>free</h6></span>
               <% } else { %>
-                <span class="price"><h6><em>$</em><%= course.price %></h6></span>
+                <span class="price"><h6><em>$</em><%= enrollment.course.price %></h6></span>
               <% } %>
             </div>
             <div class="down-content">
-              <span class="author"><%= course.teacher.user.name %></span>
-              <h4><%= course.title %></h4>
+              <span class="author"><%= enrollment.course.teacher.user.name %></span>
+              <h4><%= enrollment.course.title %></h4>
             </div>
           </div>
         </div>

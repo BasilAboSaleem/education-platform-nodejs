@@ -44,9 +44,9 @@ const studentEnrollments = await Enrollment.find({
           );
         });
       }
-      
-  
-      res.render("pages/teacher/studentEnrollments", { studentEnrollments, moment: moment });
+
+
+      res.render("pages/teacher/enrollments/studentEnrollments", { studentEnrollments, moment: moment });
     } catch (err) {
       console.log(err);
       res.status(500).send("Internal Server Error");
@@ -66,7 +66,7 @@ const studentEnrollments = await Enrollment.find({
           .populate("course");
         const payment = await Payment.findOne({enrollment: enrollment._id}).populate("enrollment");
 
-        res.render("pages/teacher/enrollmentDetails", { enrollment, payment , moment: moment });
+        res.render("pages/teacher/enrollments/enrollmentDetails", { enrollment, payment , moment: moment });
     }
     catch(err){
         console.log(err);

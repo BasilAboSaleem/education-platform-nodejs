@@ -68,7 +68,7 @@ student_course_lesson_get = async (req, res) => {
     const nextLesson = course.lessons[lessonIndex + 1] || null;
 
     // تم إرسال جميع البيانات إلى صفحة الدرس الخاصة بالطالب
-    res.render("pages/student/lesson-view", {
+    res.render("pages/student/lessons/lesson-view", {
       lesson,
       course,
       prevLesson,
