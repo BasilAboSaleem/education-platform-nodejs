@@ -37,10 +37,5 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
-// التحقق من كلمة المرور عند تسجيل الدخول
-/*userSchema.methods.matchPassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
-}
-  ;*/
 
 module.exports = mongoose.models.User || mongoose.model('User', userSchema);

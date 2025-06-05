@@ -1,76 +1,76 @@
-# TODO List for the Educational Platform Project
 
-This file contains a list of planned improvements, features, and tasks to be implemented in future iterations of the project.
+# 📋 To-Do List – Educational Platform Project
+
+This file outlines planned features and enhancements to be implemented in the future to improve and scale the project.
 
 ---
 
 ## 🔧 Backend Improvements
 
-- [ ] Add email notifications for student actions (enrollment, course completion, etc.)
-- [ ] Implement proper error handling and centralized error middleware
-- [ ] Add validation middleware for all routes
-- [ ] Write unit and integration tests using Jest or Mocha
-- [ ] Refactor controllers to improve separation of concerns
+- [ ] Add email notifications when students perform certain actions (e.g., enrollment, course completion)
+- [x] Implement centralized error handling (Error Middleware)
+- [x] Add validation for all routes
+- [x] Refactor controllers for better separation of concerns
 
 ---
 
 ## 💳 Payment System
 
-- [ ]  Develop the payment system to become a separate and independent model.
-- [ ] Integrate real payment gateway (e.g., Stripe or PayPal)
-- [ ] Add a "payment history" page for students
-- [ ] Send invoice emails after successful payments
-- [ ] Add payment status logs for admin dashboard
+- [x] Refactor payment system into a standalone and modular model
+- [ ] Integrate a real payment gateway (e.g., Stripe, PayPal)
+- [x] Add a "Payment History" page for students
+- [ ] Send invoices via email after successful payments
+- [x] Track and display payment status in the admin dashboard
 
 ---
 
 ## 📚 Course Features
 
-- [ ] Allow teachers to add video lessons and resources
-- [ ] Add course ratings and reviews system
-- [ ] Create a progress tracking feature for students
-- [ ] Implement course completion certificate generation
+- [ ] Allow teachers to upload video lessons and educational files
+- [ ] Add a course review and rating system
+- [x] Implement student progress tracking
+- [ ] Automatically generate completion certificates
 
 ---
 
-## 🧑‍🏫 Teacher Panel
+## 🧑‍🏫 Teacher Dashboard
 
-- [ ] Build dashboard for teachers to manage their courses and students
-- [ ] Add analytics (number of students, earnings, feedback)
-- [ ] Allow teachers to communicate with students
-
----
-
-## 🧑‍🎓 Student Panel
-
-- [ ] Add profile settings (edit email, change password, etc.)
-- [ ] Show list of enrolled and completed courses
-- [ ] Enable comments/questions under each lesson
+- [x] Build a dashboard for teachers to manage courses and students
+- [x] Add analytics (e.g., number of students, earnings, reviews)
+- [ ] Enable messaging between teachers and students
+- [x] Add profile settings (change email, password, etc.)
 
 ---
 
-## 🌐 General UI/UX
+## 🧑‍🎓 Student Dashboard
 
-- [ ] Add Dark/Light mode toggle
-- [ ] Improve responsiveness for mobile screens
-- [ ] Add loading spinners for API calls
+- [x] Add profile settings (change email, password, etc.)
+- [x] Display list of enrolled and completed courses
+- [ ] Allow students to comment or ask questions within each lesson
+
+---
+
+## 🌐 UI/UX Design
+
+- [ ] Implement dark/light mode toggle
+- [x] Improve responsiveness across devices
 
 ---
 
 ## 🛡️ Authentication & Security
 
-- [ ] Add forgot password and reset functionality
-- [ ] Implement rate limiting on login routes
-- [ ] Store passwords with bcrypt and follow best practices
+- [x] Add "Forgot Password" and password reset functionality
+- [x] Implement rate limiting on the login route
+- [x] Secure password storage using bcrypt (following best practices)
 
 ---
 
-## 🗃️ Other Enhancements
+## 🗃️ General Enhancements
 
-- [ ] Add multilingual support (Arabic/English)
+- [ ] Add multi-language support (Arabic/English)
 - [ ] Create sitemap and robots.txt for SEO
-- [ ] Prepare for deployment on Vercel/Render/Heroku
+- [x] Prepare project deployment for platforms like Vercel, Render, or Heroku
 
 ---
 
-> This list will be updated regularly as the project evolves. Contributions and feedback are welcome!
+> This list will be updated regularly as the project evolves. Feedback and contributions are always welcome!

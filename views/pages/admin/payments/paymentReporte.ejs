@@ -120,8 +120,11 @@
                           <% payments.forEach((payments) => { %>
                           <tr>
                             <td><%= payments.transactionId %></td>
-                            <td><%= payments.enrollment.student.user.name %></td>
-                            <td><%= payments.enrollment.course.title %></td>
+<td>
+  <%= payments.enrollment && payments.enrollment.student && payments.enrollment.student.user 
+      ? payments.enrollment.student.user.name 
+      : 'N/A' %>
+</td>                            <td><%= payments.enrollment.course.title %></td>
                             <td>$<%= payments.amount %></td>
                             <td><%= payments.paymentMethod %></td>
                             <td>
@@ -228,8 +231,16 @@
                             <% unpaidPayments.forEach((payment) => { %>
                             <tr>
                               <td><%= payment.transactionId %></td>
-                              <td><%= payment.enrollment.student.user.name %></td>
-                              <td><%= payment.enrollment.student.user.email %></td>
+<td>
+  <%= payment.enrollment && payment.enrollment.student && payment.enrollment.student.user && payment.enrollment.student.user.name 
+      ? payment.enrollment.student.user.name 
+      : 'N/A' %>
+</td>
+                             <td>
+  <%= payment.enrollment && payment.enrollment.student && payment.enrollment.student.user && payment.enrollment.student.user.email 
+      ? payment.enrollment.student.user.email 
+      : 'N/A' %>
+</td>
                               <td><%= payment.enrollment.course.title %></td>
                               <td>$<%= payment.amount %></td>
                               <td><label class="badge badge-warning"><%= payment.paymentStatus %></label></td>
@@ -282,7 +293,11 @@
                             <% paidPayments.forEach((payment) => { %>
                             <tr>
                               <td><%= payment.transactionId %></td>
-                              <td><%= payment.enrollment.student.user.name %></td>
+<td>
+  <%= payment.enrollment && payment.enrollment.student && payment.enrollment.student.user && payment.enrollment.student.user.name 
+      ? payment.enrollment.student.user.name 
+      : 'N/A' %>
+</td>
                               <td><%= payment.enrollment.course.title %></td>
                               <td>$<%= payment.amount %></td>
                               <td><%= payment.paymentMethod %></td>

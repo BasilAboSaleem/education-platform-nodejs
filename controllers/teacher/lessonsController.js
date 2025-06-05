@@ -14,7 +14,7 @@ teacher_course_lessons_get = async (req, res) => {
         }
         const lessons = await Lesson.find({course: req.params.id}).populate("course");
 
-        res.render("pages/teacher/lessons/course-lessons", { course: course , moment: moment, lessons: lessons });
+        res.render("pages/teacher/lessons/course-lesoons", { course: course , moment: moment, lessons: lessons });
 
     }
     catch(err){
@@ -99,11 +99,36 @@ teacher_course_lesson_edit_put = async (req, res) => {
     }
 }
 
+teacher_course_lesson_delete = async (req, res) => {
+    try {
+        const lesson = await Lesson.findByIdAndDelete(req.params.lessonId);
+        if (!lesson) {
+            req.flash("error", "Lesson not found");
+            return res.redirect(`/teacher/courses/${req.params.courseId}/lessons`);
+        }
+
+        // Remove the lesson from the course's lessons array
+        await Course.findByIdAndUpdate(req.params.courseId, {
+            $pull: { lessons: lesson._id }
+        });
+
+        req.flash("success", "Lesson deleted successfully");
+        res.redirect(`/teacher/courses/${req.params.courseId}/lessons`);
+    }
+    catch (err) {
+        console.log(err);
+        req.flash("error", "An error occurred");
+        res.redirect("/teacher/courses");
+    }
+}
+
+
 module.exports = {
     teacher_course_lessons_get,
     teacher_course_add_lesson_get,
     teacher_course_add_lesson_post,
     teacher_course_lesson_view_get,
     teacher_course_lesson_edit_get,
-    teacher_course_lesson_edit_put
+    teacher_course_lesson_edit_put,
+    teacher_course_lesson_delete
 };

@@ -75,6 +75,7 @@ const isAdmin = (req, res, next) => {
         res.status(403).send('Access denied.');
     }
 }
+
 const isTeacher = (req, res, next) => {
     if (req.user && req.user.role === 'Teacher') {
         next();
@@ -101,10 +102,6 @@ const loginLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
-
-
-
-
 
 module.exports = {
     requireAuth,

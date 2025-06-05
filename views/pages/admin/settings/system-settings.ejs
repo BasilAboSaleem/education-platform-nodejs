@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin Dashboard - System Settings</title>
 
-  <!-- روابط CSS (بفرض ملفات القالب موجودة لديك) -->
   <link rel="stylesheet" href="/assets/vendors/feather/feather.css" />
   <link rel="stylesheet" href="/assets/vendors/mdi/css/materialdesignicons.min.css" />
   <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css" />
@@ -237,7 +236,6 @@
         <textarea name="sliderItems[<%= index %>][description]" rows="3"><%= slide.description %></textarea>
       </div>
 
-      <!-- ✅ الحقول الجديدة -->
       <div class="form-group">
         <label>Main Button Text</label>
         <input type="text" name="sliderItems[<%= index %>][mainButtonText]" value="<%= slide.mainButtonText || '' %>" />

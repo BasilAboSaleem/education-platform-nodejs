@@ -20,7 +20,7 @@ student_course_payment_get = async (req, res) => {
       return res.redirect("/student/my-courses/courseDetails/" + courseId);
     }
 
-    res.render("pages/student/payment", { enrollment });
+    res.render("pages/student/payments/payment", { enrollment });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Internal server error" });
@@ -60,7 +60,7 @@ student_course_payment_post = async (req, res) => {
       path: "user",
       select: "name",
     });
-    const notification = await Notefication.create({
+    const notification = await Notification.create({
       recipient: teacher.user._id,
       sender: req.user._id,
       targetRole: "teacher",
@@ -69,7 +69,7 @@ student_course_payment_post = async (req, res) => {
     });
     //ارشال اشعار للأدمن
     const admin = await User.findOne({ role: "Admin" });
-    const adminNotification = await Notefication.create({
+    const adminNotification = await Notification.create({
       recipient: admin._id,
       sender: req.user._id,
       targetRole: "admin",

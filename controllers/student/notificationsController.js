@@ -7,12 +7,12 @@ student_notifications_get = async (req, res) => {
   try {
 
     // تحديث حالة الإشعارات الغير مقروءة إلى مقروءة
-    await Notefication.updateMany(
+    await Notification.updateMany(
       { recipient: req.user._id, isRead: false },
       { $set: { isRead: true } }
     );
 // جلب جميع الإشعارات الخاصة بالمستخدم
-    const notifications = await Notefication.find({ recipient: req.user._id }).populate({
+    const notifications = await Notification.find({ recipient: req.user._id }).populate({
       path: "sender",
       select: "name",
       model: "User",

@@ -4,16 +4,16 @@ const  Schema  = mongoose.Schema;
 const adminSchema = new Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',  // ربط الموديل مع موديل User
+    ref: 'User',  
     required: true,
   },
   role: {
     type: String,
-    default: 'admin',  // تأكيد أن هذا هو أدمن
+    default: 'admin',  
   },
   dateAssigned: {
     type: Date,
-    default: Date.now,  // تاريخ تعيين الأدمن
+    default: Date.now,  
   },
   assignedBy: {
     type: mongoose.Schema.Types.ObjectId,
@@ -42,5 +42,3 @@ const adminSchema = new Schema({
 
 module.exports = mongoose.models.Admin || mongoose.model('Admin', adminSchema);
 
-/*const Admin = mongoose.model('Admin', adminSchema);
-module.exports = Admin;*/

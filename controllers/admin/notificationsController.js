@@ -84,7 +84,7 @@ if (user.role.toLowerCase() !== expectedRole) {
 }
 
       await Notification.create({
-        targetRole:  expectedRole, // ✅ يجب أن تكون 'student' أو 'teacher',
+        targetRole:  expectedRole, // 'student' or 'teacher'
         recipient: user._id,
         message,
         title,

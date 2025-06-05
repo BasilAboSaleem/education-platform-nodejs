@@ -67,7 +67,7 @@ const {
         message: `Your course "${course.title}" has been published.`,
         recipient: course.teacher.user._id,
         sender: req.user._id, 
-        course: course.title,
+        course: course._id,
         link: `/teacher/courses/${course._id}`,
       });
       req.flash('success', 'Course published successfully');
@@ -97,7 +97,7 @@ const {
         message: `Your course "${course.title}" has been rejected. Reason: ${req.body.rejectionReason}`,
         recipient: course.teacher.user._id,
         sender: req.user._id, 
-        course: course.title,
+        course: course._id,
         link: `/teacher/courses/${course._id}`,
       });
       req.flash('success', 'Course rejected successfully');
@@ -192,7 +192,7 @@ const {
           model: 'User'
         }
       }).populate('category').sort({ createdAt: -1 }).lean(); // استخدام populate لجلب بيانات المعلم والفئة
-      // ✅ فلترة النتائج حسب اسم المعلم
+      //  فلترة النتائج حسب اسم المعلم
 const filteredCourses = courses.filter(course =>
   course.teacher?.user?.name?.toLowerCase().includes(query.toLowerCase()) ||
   course.category?.name?.toLowerCase().includes(query.toLowerCase())
